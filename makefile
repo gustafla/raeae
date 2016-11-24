@@ -7,8 +7,7 @@ CC=gcc
 CFLAGS=-nostdlib -MMD -MP -Wl,--build-id=none
 INCLUDES=-I./
 LFLAGS=-L/opt/vc/lib
-#LIBS=-lGLESv2 -lEGL -lbcm_host
-LIBS=
+LIBS=-lGLESv2 -lEGL -lbcm_host
 
 default: $(TARGET)
 	strip --strip-all $(TARGET)
