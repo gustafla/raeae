@@ -1,7 +1,9 @@
+/* Copyright 2016 Lauri Gustafsson */
+/* println.h: single null terminated line printing to stdio. */
+
 #ifndef PRINTLN_H
 #define PRINTLN_H
 
-int countString(char* str);
 void println(char* msg);
 
 #endif
