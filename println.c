@@ -16,16 +16,16 @@ void println(char* msg) {
     int len = countString(msg);
 
     /* These are needed to avoid some relocation error... */
-    char** pmsg = &msg;
-    int* plen = &len;
+    /*char** pmsg = &msg;
+    int* plen = &len;*/
 
     /* syscall write(int fd, const void *buf, size_t count) */
-    asm (
+    asm volatile (
     	"ldr %%r1, [%[msg]];"   /* buf = msg */
     	"ldr %%r2, [%[len]];"   /* count = len */
     	"mov %%r0, $1;"         /* file handle 1 is stdout */
     	"mov %%r7, $4;"         /* write is syscall 4 */
     	"swi $0;"               /* invoke syscall */
-        : : [msg] "r" (pmsg), [len] "r" (plen) :  /* msg and len */
+        : : [msg] "r" (&msg), [len] "r" (&len) : "r0", "r1", "r2", "r7" /* msg and len */
 	);
 }

@@ -4,15 +4,13 @@ SRCS=$(wildcard *.c) $(wildcard */*.c)
 TARGET=raeae
 OBJS=$(SRCS:.c=.o)
 CC=gcc
-CFLAGS=-nostdlib -MMD -MP -Wl,--build-id=none
+CFLAGS= -MMD -MP -Wl,--build-id=none -march=armv6j -mfpu=vfp -mfloat-abi=hard -ffast-math -fno-inline -fpeephole2 -fexpensive-optimizations -nostdlib -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables
 INCLUDES=-I./
-LFLAGS=-L/opt/vc/lib
-LIBS=-lGLESv2 -lEGL -lbcm_host
+LFLAGS=-L/opt/vc/lib -L/usr/lib
+LIBS=-lGLESv2 -lEGL -lbcm_host -lSDL
 
-default: $(TARGET)
-	strip --strip-all $(TARGET)
-	strip --remove-section .ARM.attributes $(TARGET)
-	strip --remove-section .comment $(TARGET)
+all: $(TARGET)
+	sstrip $(TARGET)
 	@echo "Finished."
 	
 $(TARGET): $(OBJS)
