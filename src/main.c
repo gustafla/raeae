@@ -3,6 +3,13 @@
 
 #include "dnload.h"
 
+#include "globals.h"
+
+#include <SDL.h>
+#include <stdio.h>
+#include "synth.c"
+#include "video.c"
+
 #ifdef USE_LD
 int main()
 #else
@@ -13,7 +20,11 @@ void _start()
 	dnload_puts("Kalteri Mafia rul3z while preparing the demo!!1");
     dnload_SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER);
 
-    while (1);
+    videoInit(G_VIDEO_X, G_VIDEO_Y);
+
+    while (gDemoRunning) {
+        
+    }
 
     /* exit syscall */
 #ifdef USE_LD
