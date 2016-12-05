@@ -1,19 +1,14 @@
 /* Copyright 2016 Lauri Gustafsson */
 /* main.c: implements entry and exit for the program and demo setup */
 
-#include "println.h"
+#include "println.c"
 #include <SDL/SDL.h>
 
-void main() {
+void _start() {
 	println("Kalteri Mafia rul3z while preparing the demo!!1\n");
     SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER);
 
     while (1);
-}
-
-void _start() {
-
-    main();
 
     /* exit syscall */
     asm (

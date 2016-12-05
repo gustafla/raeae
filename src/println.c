@@ -1,8 +1,6 @@
 /* Copyright 2016 Lauri Gustafsson */
 /* println.c: implements single null terminated line printing to stdio. */
 
-#include "println.h"
-
 /* Returns the numer of characters before \n +1 in str */
 int countString (char* str) {
     int n;

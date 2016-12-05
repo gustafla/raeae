@@ -1,10 +1,11 @@
 # A makefile.
 
-SRCS=$(wildcard *.c) $(wildcard */*.c)
+#SRCS=$(wildcard *.c) $(wildcard */*.c)
+SRCS=main.c
 TARGET=raeae
 OBJS=$(SRCS:.c=.o)
 CC=gcc
-CFLAGS= -MMD -MP -Wl,--build-id=none -march=armv6j -mfpu=vfp -mfloat-abi=hard -ffast-math -fno-inline -fpeephole2 -fexpensive-optimizations -nostdlib -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables
+CFLAGS=-Wl,--build-id=none -march=armv6j -mfpu=vfp -mfloat-abi=hard -ffast-math -fno-inline -fpeephole2 -fexpensive-optimizations -nostdlib -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fwhole-program
 INCLUDES=-I./
 LFLAGS=-L/opt/vc/lib -L/usr/lib
 LIBS=-lGLESv2 -lEGL -lbcm_host -lSDL
@@ -17,7 +18,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $(OBJS) $(LFLAGS) $(LIBS)
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@ -E
 	
 clean:
 	find ./ -type f -name "*.o" -delete
