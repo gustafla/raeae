@@ -5,7 +5,7 @@
 #include <SDL/SDL.h>
 
 void _start() {
-	println("Kalteri Mafia rul3z while preparing the demo!!1\n");
+    println("Kalteri Mafia rul3z while preparing the demo!!1\n");
     SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER);
 
     while (1);
