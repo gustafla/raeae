@@ -10,7 +10,6 @@
 
 void videoInit(int w, int h) {
     videocore_create_native_window(w, h);
-    dnload_glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void videoSwapBuffers() {

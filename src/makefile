@@ -6,8 +6,7 @@ CFLAGS=-g -fwhole-program -I/usr/include/SDL -I/opt/vc/include -DUSE_LD
 LFLAGS=-L/opt/vc/lib -lSDL -lGLESv2 -lEGL -lbcm_host
 
 all:
-	make size
-	make debug
+	make debug && make size
 
 size:
 	$(PYTHON) $(DNLOAD) -a sdl1 -v -c $(ENTRY) -o $(TARGET)

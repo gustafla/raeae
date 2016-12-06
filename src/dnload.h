@@ -149,6 +149,7 @@ static void asm_exit(void)
 #define dnload_vc_dispmanx_display_open vc_dispmanx_display_open
 #define dnload_SDL_Init SDL_Init
 #define dnload_SDL_Quit SDL_Quit
+#define dnload_glClearColor glClearColor
 #define dnload_puts puts
 #define dnload_graphics_get_display_size graphics_get_display_size
 #define dnload_eglGetDisplay eglGetDisplay
@@ -171,6 +172,7 @@ static void asm_exit(void)
 #define dnload_vc_dispmanx_display_open g_symbol_table.vc_dispmanx_display_open
 #define dnload_SDL_Init g_symbol_table.SDL_Init
 #define dnload_SDL_Quit g_symbol_table.SDL_Quit
+#define dnload_glClearColor g_symbol_table.glClearColor
 #define dnload_puts g_symbol_table.puts
 #define dnload_graphics_get_display_size g_symbol_table.graphics_get_display_size
 #define dnload_eglGetDisplay g_symbol_table.eglGetDisplay
@@ -197,6 +199,7 @@ static struct SymbolTableStruct
   DISPMANX_DISPLAY_HANDLE_T (*vc_dispmanx_display_open)(uint32_t);
   int (*SDL_Init)(Uint32);
   void (*SDL_Quit)(void);
+  void (DNLOAD_APIENTRY *glClearColor)(GLclampf, GLclampf, GLclampf, GLclampf);
   int (*puts)(const char*);
   int32_t (*graphics_get_display_size)(const uint16_t, uint32_t*, uint32_t*);
   EGLDisplay (*eglGetDisplay)(NativeDisplayType);
@@ -218,6 +221,7 @@ static struct SymbolTableStruct
   (DISPMANX_DISPLAY_HANDLE_T (*)(uint32_t))0x6df9e514,
   (int (*)(Uint32))0x70d6574,
   (void (*)(void))0x7eb657f3,
+  (void (DNLOAD_APIENTRY *)(GLclampf, GLclampf, GLclampf, GLclampf))0x8c118fbb,
   (int (*)(const char*))0x950c8684,
   (int32_t (*)(const uint16_t, uint32_t*, uint32_t*))0x97bb35db,
   (EGLDisplay (*)(NativeDisplayType))0xabd36ff6,
@@ -477,7 +481,7 @@ static void* dnload_find_symbol(uint32_t hash)
 static void dnload(void)
 {
   unsigned ii;
-  for(ii = 0; (19 > ii); ++ii)
+  for(ii = 0; (20 > ii); ++ii)
   {
     void **iter = ((void**)&g_symbol_table) + ii;
     *iter = dnload_find_symbol(*(uint32_t*)iter);
