@@ -2,7 +2,7 @@
 
 #include "dnload_egl.h"
 #include "dnload_videocore.h"
-#include <GLES2/gl2.h>
+/*#include <GLES2/gl2.h>*/
 #include <SDL.h>
 
 void videoInit(int w, int h) {
