@@ -141,12 +141,14 @@ static void asm_exit(void)
 /** \cond */
 #define dnload_bcm_host_init bcm_host_init
 #define dnload_eglInitialize eglInitialize
+#define dnload_glClear glClear
 #define dnload_eglCreateWindowSurface eglCreateWindowSurface
 #define dnload_eglSwapBuffers eglSwapBuffers
 #define dnload_vc_dispmanx_update_submit_sync vc_dispmanx_update_submit_sync
 #define dnload_vc_dispmanx_element_add vc_dispmanx_element_add
 #define dnload_vc_dispmanx_display_open vc_dispmanx_display_open
 #define dnload_SDL_Init SDL_Init
+#define dnload_SDL_Quit SDL_Quit
 #define dnload_puts puts
 #define dnload_graphics_get_display_size graphics_get_display_size
 #define dnload_eglGetDisplay eglGetDisplay
@@ -161,12 +163,14 @@ static void asm_exit(void)
 /** \cond */
 #define dnload_bcm_host_init g_symbol_table.bcm_host_init
 #define dnload_eglInitialize g_symbol_table.eglInitialize
+#define dnload_glClear g_symbol_table.glClear
 #define dnload_eglCreateWindowSurface g_symbol_table.eglCreateWindowSurface
 #define dnload_eglSwapBuffers g_symbol_table.eglSwapBuffers
 #define dnload_vc_dispmanx_update_submit_sync g_symbol_table.vc_dispmanx_update_submit_sync
 #define dnload_vc_dispmanx_element_add g_symbol_table.vc_dispmanx_element_add
 #define dnload_vc_dispmanx_display_open g_symbol_table.vc_dispmanx_display_open
 #define dnload_SDL_Init g_symbol_table.SDL_Init
+#define dnload_SDL_Quit g_symbol_table.SDL_Quit
 #define dnload_puts g_symbol_table.puts
 #define dnload_graphics_get_display_size g_symbol_table.graphics_get_display_size
 #define dnload_eglGetDisplay g_symbol_table.eglGetDisplay
@@ -185,12 +189,14 @@ static struct SymbolTableStruct
 {
   void (*bcm_host_init)(void);
   EGLBoolean (*eglInitialize)(EGLDisplay, EGLint*, EGLint*);
+  void (DNLOAD_APIENTRY *glClear)(GLbitfield);
   EGLSurface (*eglCreateWindowSurface)(EGLDisplay, EGLConfig, EGLNativeWindowType, EGLint const*);
   EGLBoolean (*eglSwapBuffers)(EGLDisplay, EGLSurface);
   int (*vc_dispmanx_update_submit_sync)(DISPMANX_UPDATE_HANDLE_T);
   DISPMANX_ELEMENT_HANDLE_T (*vc_dispmanx_element_add)(DISPMANX_UPDATE_HANDLE_T, DISPMANX_DISPLAY_HANDLE_T, int32_t, const VC_RECT_T*, DISPMANX_RESOURCE_HANDLE_T, const VC_RECT_T*, DISPMANX_PROTECTION_T, VC_DISPMANX_ALPHA_T*, DISPMANX_CLAMP_T*, DISPMANX_TRANSFORM_T);
   DISPMANX_DISPLAY_HANDLE_T (*vc_dispmanx_display_open)(uint32_t);
   int (*SDL_Init)(Uint32);
+  void (*SDL_Quit)(void);
   int (*puts)(const char*);
   int32_t (*graphics_get_display_size)(const uint16_t, uint32_t*, uint32_t*);
   EGLDisplay (*eglGetDisplay)(NativeDisplayType);
@@ -204,12 +210,14 @@ static struct SymbolTableStruct
 {
   (void (*)(void))0x152389b4,
   (EGLBoolean (*)(EGLDisplay, EGLint*, EGLint*))0x1e979dfa,
+  (void (DNLOAD_APIENTRY *)(GLbitfield))0x1fd92088,
   (EGLSurface (*)(EGLDisplay, EGLConfig, EGLNativeWindowType, EGLint const*))0x28e70577,
   (EGLBoolean (*)(EGLDisplay, EGLSurface))0x2bbe59d6,
   (int (*)(DISPMANX_UPDATE_HANDLE_T))0x318e9a39,
   (DISPMANX_ELEMENT_HANDLE_T (*)(DISPMANX_UPDATE_HANDLE_T, DISPMANX_DISPLAY_HANDLE_T, int32_t, const VC_RECT_T*, DISPMANX_RESOURCE_HANDLE_T, const VC_RECT_T*, DISPMANX_PROTECTION_T, VC_DISPMANX_ALPHA_T*, DISPMANX_CLAMP_T*, DISPMANX_TRANSFORM_T))0x5589e071,
   (DISPMANX_DISPLAY_HANDLE_T (*)(uint32_t))0x6df9e514,
   (int (*)(Uint32))0x70d6574,
+  (void (*)(void))0x7eb657f3,
   (int (*)(const char*))0x950c8684,
   (int32_t (*)(const uint16_t, uint32_t*, uint32_t*))0x97bb35db,
   (EGLDisplay (*)(NativeDisplayType))0xabd36ff6,
@@ -469,7 +477,7 @@ static void* dnload_find_symbol(uint32_t hash)
 static void dnload(void)
 {
   unsigned ii;
-  for(ii = 0; (17 > ii); ++ii)
+  for(ii = 0; (19 > ii); ++ii)
   {
     void **iter = ((void**)&g_symbol_table) + ii;
     *iter = dnload_find_symbol(*(uint32_t*)iter);

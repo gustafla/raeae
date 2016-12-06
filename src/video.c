@@ -2,11 +2,12 @@
 
 #include "dnload_egl.h"
 #include "dnload_videocore.h"
-/*#include <GLES2/gl2.h>*/
+#include <GLES2/gl2.h>
 #include <SDL.h>
 
 void videoInit(int w, int h) {
     videocore_create_native_window(w, h);
+    dnload_glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void videoSwapBuffers() {
