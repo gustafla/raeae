@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "synth.c"
 #include "video.c"
+#include "demo.c"
 
 #ifdef USE_LD
 int main()
@@ -21,6 +22,8 @@ void _start()
     dnload_SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER);
 
     videoInit(G_VIDEO_X, G_VIDEO_Y);
+
+    demoMainLoop();
 
     videoDeinit();
     dnload_SDL_Quit();

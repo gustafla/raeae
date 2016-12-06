@@ -3,7 +3,7 @@ ENTRY=main.c
 DNLOAD=~/programs/dnload/dnload.py
 PYTHON=python2.7
 CFLAGS=-g -fwhole-program -I/usr/include/SDL -I/opt/vc/include -DUSE_LD
-LFLAGS=-lSDL -lGLESv2 -lEGL -lbcm_host
+LFLAGS=-L/opt/vc/lib -lSDL -lGLESv2 -lEGL -lbcm_host
 
 all:
 	make size
@@ -14,7 +14,7 @@ size:
 
 debug:
 	$(PYTHON) $(DNLOAD) -a sdl1 -v $(ENTRY)
-	gcc $(CFLAGS) main.c $(LFLAGS) -o $(TARGET).debug 
+	g++ $(CFLAGS) main.c $(LFLAGS) -o $(TARGET).debug 
 
 clean:
 	rm -f *.S *.o *.unprocessed *.stripped *.bin *.ld $(TARGET)*
