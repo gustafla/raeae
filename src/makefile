@@ -6,7 +6,7 @@ TARGET=raeae
 OBJS=$(SRCS:.c=.o)
 CC=gcc
 CFLAGS=-Wl,--build-id=none -march=armv6j -mfpu=vfp -mfloat-abi=hard -ffast-math -fno-inline -fpeephole2 -fexpensive-optimizations -nostdlib -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables
-INCLUDES=-I./
+INCLUDES=-I./ -I/usr/include/SDL -I/opt/vc/include
 LFLAGS=-L/opt/vc/lib -L/usr/lib -lGLESv2 -lEGL -lbcm_host -lSDL
 
 all: $(TARGET)
