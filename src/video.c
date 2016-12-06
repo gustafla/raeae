@@ -5,6 +5,9 @@
 #include <GLES2/gl2.h>
 #include <SDL.h>
 
+#ifndef VIDEO_C
+#define VIDEO_C
+
 void videoInit(int w, int h) {
     videocore_create_native_window(w, h);
     dnload_glClear(GL_COLOR_BUFFER_BIT);
@@ -18,3 +21,5 @@ void videoDeinit() {
     egl_quit(g_egl_display);
     dnload_bcm_host_deinit();
 }
+
+#endif
