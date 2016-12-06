@@ -14,11 +14,11 @@ all: $(TARGET)
 	sstrip $(TARGET)
 	@echo "Finished."
 	
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $(OBJS) $(LFLAGS) $(LIBS)
+$(TARGET):
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $(SRCS) $(LFLAGS) $(LIBS)
 
-.c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+#.c.o:
+#	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 	
 clean:
 	find ./ -type f -name "*.o" -delete
