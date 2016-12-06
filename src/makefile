@@ -11,11 +11,17 @@ LFLAGS=-L/opt/vc/lib -L/usr/lib
 LIBS=-lGLESv2 -lEGL -lbcm_host -lSDL
 
 all: $(TARGET)
-	sstrip $(TARGET)
+	cp $(TARGET).bin $(TARGET).stripped
+	sstrip $(TARGET).stripped
+	cp $(TARGET).stripped $(TARGET).nounpacker
+	xz --format=lzma --lzma1=preset=9,lc=1,lp=0,pb=0 $(TARGET).nounpacker
+	printf "HOME=/tmp/i;sed 1d \$$0|lzcat>~;chmod +x ~;~;exit\n" >$(TARGET)
+	cat $(TARGET).nounpacker.lzma >> $(TARGET)
+	chmod +x $(TARGET)
 	@echo "Finished."
 	
 $(TARGET):
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $(SRCS) $(LFLAGS) $(LIBS)
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET).bin $(SRCS) $(LFLAGS) $(LIBS)
 
 #.c.o:
 #	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
