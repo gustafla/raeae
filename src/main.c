@@ -27,7 +27,6 @@ void _start()
 
     videoDeinit();
     dnload_SDL_Quit();
-    dnload_puts("Bye.");
     /* exit syscall */
 #ifdef USE_LD
     return 0;

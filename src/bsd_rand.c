@@ -2,12 +2,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <features.h>
 
 /** BSD random var. */
 static bsd_u_long bsd_rand_next = 2;
 
 int bsd_rand(void)
 {
+#ifdef __GNU_LIBRARY__
+    return rand();
+#else
   /*
    * Compute x = (7^5 * x) mod (2^31 - 1)
    * without overflowing 31 bits:
@@ -27,12 +31,17 @@ int bsd_rand(void)
   bsd_rand_next = (bsd_u_long)x;
   /* Transform to [0, 0x7ffffffd] range. */
   return (int)(x - 1);
+#endif
 }
 
 void bsd_srand(bsd_u_int seed)
 {
+#ifdef __GNU_LIBRARY__
+    srand(seed);
+#else
   /* Transform to [1, 0x7ffffffe] range. */
   bsd_rand_next = (seed % 0x7ffffffe) + 1;
+#endif
 }
 
 int bsd_rand_wrapper(void)

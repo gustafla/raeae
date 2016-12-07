@@ -156,6 +156,7 @@ static void asm_exit(void)
 #define dnload_bcm_host_deinit bcm_host_deinit
 #define dnload_eglTerminate eglTerminate
 #define dnload_vc_dispmanx_update_start vc_dispmanx_update_start
+#define dnload_SDL_GetTicks SDL_GetTicks
 #define dnload_eglCreateContext eglCreateContext
 #define dnload_eglChooseConfig eglChooseConfig
 #define dnload_eglMakeCurrent eglMakeCurrent
@@ -179,6 +180,7 @@ static void asm_exit(void)
 #define dnload_bcm_host_deinit g_symbol_table.bcm_host_deinit
 #define dnload_eglTerminate g_symbol_table.eglTerminate
 #define dnload_vc_dispmanx_update_start g_symbol_table.vc_dispmanx_update_start
+#define dnload_SDL_GetTicks g_symbol_table.SDL_GetTicks
 #define dnload_eglCreateContext g_symbol_table.eglCreateContext
 #define dnload_eglChooseConfig g_symbol_table.eglChooseConfig
 #define dnload_eglMakeCurrent g_symbol_table.eglMakeCurrent
@@ -206,6 +208,7 @@ static struct SymbolTableStruct
   void (*bcm_host_deinit)(void);
   EGLBoolean (*eglTerminate)(EGLDisplay);
   DISPMANX_UPDATE_HANDLE_T (*vc_dispmanx_update_start)(int32_t);
+  uint32_t (*SDL_GetTicks)(void);
   EGLContext (*eglCreateContext)(EGLDisplay, EGLConfig, EGLContext, EGLint const*);
   EGLBoolean (*eglChooseConfig)(EGLDisplay, EGLint const*, EGLConfig*, EGLint, EGLint*);
   EGLBoolean (*eglMakeCurrent)(EGLDisplay, EGLSurface, EGLSurface, EGLContext);
@@ -228,6 +231,7 @@ static struct SymbolTableStruct
   (void (*)(void))0xadd96fb5,
   (EGLBoolean (*)(EGLDisplay))0xb87f4317,
   (DISPMANX_UPDATE_HANDLE_T (*)(int32_t))0xb8dfc099,
+  (uint32_t (*)(void))0xd1d0b104,
   (EGLContext (*)(EGLDisplay, EGLConfig, EGLContext, EGLint const*))0xd95202a9,
   (EGLBoolean (*)(EGLDisplay, EGLint const*, EGLConfig*, EGLint, EGLint*))0xf4628a23,
   (EGLBoolean (*)(EGLDisplay, EGLSurface, EGLSurface, EGLContext))0xf780cac1,
@@ -481,7 +485,7 @@ static void* dnload_find_symbol(uint32_t hash)
 static void dnload(void)
 {
   unsigned ii;
-  for(ii = 0; (20 > ii); ++ii)
+  for(ii = 0; (21 > ii); ++ii)
   {
     void **iter = ((void**)&g_symbol_table) + ii;
     *iter = dnload_find_symbol(*(uint32_t*)iter);
