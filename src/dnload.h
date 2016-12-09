@@ -36,11 +36,9 @@
 #include "windows.h"
 #include "GL/glew.h"
 #include "GL/glu.h"
-#include "SDL.h"
 #elif defined(__APPLE__)
 #include "GL/glew.h"
 #include <OpenGL/glu.h>
-#include "SDL.h"
 #else
 #if defined(DNLOAD_GLESV2)
 #include "GLES2/gl2.h"
@@ -49,15 +47,12 @@
 #include "GL/glew.h"
 #include "GL/glu.h"
 #endif
-#include "SDL.h"
 #endif
-#include "bsd_rand.h"
 #else
 #if defined(__APPLE__)
 #include <OpenGL/gl.h>
 #include <OpenGL/glext.h>
 #include <OpenGL/glu.h>
-#include "SDL.h"
 #else
 #if defined(DNLOAD_GLESV2)
 #include "GLES2/gl2.h"
@@ -67,9 +62,10 @@
 #include "GL/glext.h"
 #include "GL/glu.h"
 #endif
+#endif
+#endif
+
 #include "SDL.h"
-#endif
-#endif
 
 #if defined(SDL_INIT_EVERYTHING) && defined(__APPLE__) 
 #define DNLOAD_MAIN SDL_main
@@ -139,51 +135,31 @@ static void asm_exit(void)
 
 #if defined(USE_LD)
 /** \cond */
-#define dnload_bcm_host_init bcm_host_init
-#define dnload_eglInitialize eglInitialize
+#define dnload_SDL_GL_SetAttribute SDL_GL_SetAttribute
 #define dnload_glClear glClear
-#define dnload_eglCreateWindowSurface eglCreateWindowSurface
-#define dnload_eglSwapBuffers eglSwapBuffers
-#define dnload_vc_dispmanx_update_submit_sync vc_dispmanx_update_submit_sync
-#define dnload_vc_dispmanx_element_add vc_dispmanx_element_add
-#define dnload_vc_dispmanx_display_open vc_dispmanx_display_open
+#define dnload_SDL_GL_SwapWindow SDL_GL_SwapWindow
+#define dnload_SDL_CreateWindow SDL_CreateWindow
 #define dnload_SDL_Init SDL_Init
 #define dnload_SDL_Quit SDL_Quit
 #define dnload_glClearColor glClearColor
 #define dnload_puts puts
-#define dnload_graphics_get_display_size graphics_get_display_size
-#define dnload_eglGetDisplay eglGetDisplay
-#define dnload_bcm_host_deinit bcm_host_deinit
-#define dnload_eglTerminate eglTerminate
-#define dnload_vc_dispmanx_update_start vc_dispmanx_update_start
+#define dnload_SDL_ShowCursor SDL_ShowCursor
 #define dnload_SDL_GetTicks SDL_GetTicks
-#define dnload_eglCreateContext eglCreateContext
-#define dnload_eglChooseConfig eglChooseConfig
-#define dnload_eglMakeCurrent eglMakeCurrent
+#define dnload_SDL_GL_CreateContext SDL_GL_CreateContext
 /** \endcond */
 #else
 /** \cond */
-#define dnload_bcm_host_init g_symbol_table.bcm_host_init
-#define dnload_eglInitialize g_symbol_table.eglInitialize
+#define dnload_SDL_GL_SetAttribute g_symbol_table.SDL_GL_SetAttribute
 #define dnload_glClear g_symbol_table.glClear
-#define dnload_eglCreateWindowSurface g_symbol_table.eglCreateWindowSurface
-#define dnload_eglSwapBuffers g_symbol_table.eglSwapBuffers
-#define dnload_vc_dispmanx_update_submit_sync g_symbol_table.vc_dispmanx_update_submit_sync
-#define dnload_vc_dispmanx_element_add g_symbol_table.vc_dispmanx_element_add
-#define dnload_vc_dispmanx_display_open g_symbol_table.vc_dispmanx_display_open
+#define dnload_SDL_GL_SwapWindow g_symbol_table.SDL_GL_SwapWindow
+#define dnload_SDL_CreateWindow g_symbol_table.SDL_CreateWindow
 #define dnload_SDL_Init g_symbol_table.SDL_Init
 #define dnload_SDL_Quit g_symbol_table.SDL_Quit
 #define dnload_glClearColor g_symbol_table.glClearColor
 #define dnload_puts g_symbol_table.puts
-#define dnload_graphics_get_display_size g_symbol_table.graphics_get_display_size
-#define dnload_eglGetDisplay g_symbol_table.eglGetDisplay
-#define dnload_bcm_host_deinit g_symbol_table.bcm_host_deinit
-#define dnload_eglTerminate g_symbol_table.eglTerminate
-#define dnload_vc_dispmanx_update_start g_symbol_table.vc_dispmanx_update_start
+#define dnload_SDL_ShowCursor g_symbol_table.SDL_ShowCursor
 #define dnload_SDL_GetTicks g_symbol_table.SDL_GetTicks
-#define dnload_eglCreateContext g_symbol_table.eglCreateContext
-#define dnload_eglChooseConfig g_symbol_table.eglChooseConfig
-#define dnload_eglMakeCurrent g_symbol_table.eglMakeCurrent
+#define dnload_SDL_GL_CreateContext g_symbol_table.SDL_GL_CreateContext
 /** \endcond */
 /** \brief Symbol table structure.
  *
@@ -191,50 +167,30 @@ static void asm_exit(void)
  */
 static struct SymbolTableStruct
 {
-  void (*bcm_host_init)(void);
-  EGLBoolean (*eglInitialize)(EGLDisplay, EGLint*, EGLint*);
+  int (*SDL_GL_SetAttribute)(SDL_GLattr, int);
   void (DNLOAD_APIENTRY *glClear)(GLbitfield);
-  EGLSurface (*eglCreateWindowSurface)(EGLDisplay, EGLConfig, EGLNativeWindowType, EGLint const*);
-  EGLBoolean (*eglSwapBuffers)(EGLDisplay, EGLSurface);
-  int (*vc_dispmanx_update_submit_sync)(DISPMANX_UPDATE_HANDLE_T);
-  DISPMANX_ELEMENT_HANDLE_T (*vc_dispmanx_element_add)(DISPMANX_UPDATE_HANDLE_T, DISPMANX_DISPLAY_HANDLE_T, int32_t, const VC_RECT_T*, DISPMANX_RESOURCE_HANDLE_T, const VC_RECT_T*, DISPMANX_PROTECTION_T, VC_DISPMANX_ALPHA_T*, DISPMANX_CLAMP_T*, DISPMANX_TRANSFORM_T);
-  DISPMANX_DISPLAY_HANDLE_T (*vc_dispmanx_display_open)(uint32_t);
+  void (*SDL_GL_SwapWindow)(SDL_Window*);
+  SDL_Window* (*SDL_CreateWindow)(const char*, int, int, int, int, Uint32);
   int (*SDL_Init)(Uint32);
   void (*SDL_Quit)(void);
   void (DNLOAD_APIENTRY *glClearColor)(GLclampf, GLclampf, GLclampf, GLclampf);
   int (*puts)(const char*);
-  int32_t (*graphics_get_display_size)(const uint16_t, uint32_t*, uint32_t*);
-  EGLDisplay (*eglGetDisplay)(NativeDisplayType);
-  void (*bcm_host_deinit)(void);
-  EGLBoolean (*eglTerminate)(EGLDisplay);
-  DISPMANX_UPDATE_HANDLE_T (*vc_dispmanx_update_start)(int32_t);
+  int (*SDL_ShowCursor)(int);
   uint32_t (*SDL_GetTicks)(void);
-  EGLContext (*eglCreateContext)(EGLDisplay, EGLConfig, EGLContext, EGLint const*);
-  EGLBoolean (*eglChooseConfig)(EGLDisplay, EGLint const*, EGLConfig*, EGLint, EGLint*);
-  EGLBoolean (*eglMakeCurrent)(EGLDisplay, EGLSurface, EGLSurface, EGLContext);
+  SDL_GLContext (*SDL_GL_CreateContext)(SDL_Window*);
 } g_symbol_table =
 {
-  (void (*)(void))0x152389b4,
-  (EGLBoolean (*)(EGLDisplay, EGLint*, EGLint*))0x1e979dfa,
+  (int (*)(SDL_GLattr, int))0x1da21ab0,
   (void (DNLOAD_APIENTRY *)(GLbitfield))0x1fd92088,
-  (EGLSurface (*)(EGLDisplay, EGLConfig, EGLNativeWindowType, EGLint const*))0x28e70577,
-  (EGLBoolean (*)(EGLDisplay, EGLSurface))0x2bbe59d6,
-  (int (*)(DISPMANX_UPDATE_HANDLE_T))0x318e9a39,
-  (DISPMANX_ELEMENT_HANDLE_T (*)(DISPMANX_UPDATE_HANDLE_T, DISPMANX_DISPLAY_HANDLE_T, int32_t, const VC_RECT_T*, DISPMANX_RESOURCE_HANDLE_T, const VC_RECT_T*, DISPMANX_PROTECTION_T, VC_DISPMANX_ALPHA_T*, DISPMANX_CLAMP_T*, DISPMANX_TRANSFORM_T))0x5589e071,
-  (DISPMANX_DISPLAY_HANDLE_T (*)(uint32_t))0x6df9e514,
+  (void (*)(SDL_Window*))0x295bfb59,
+  (SDL_Window* (*)(const char*, int, int, int, int, Uint32))0x4fbea370,
   (int (*)(Uint32))0x70d6574,
   (void (*)(void))0x7eb657f3,
   (void (DNLOAD_APIENTRY *)(GLclampf, GLclampf, GLclampf, GLclampf))0x8c118fbb,
   (int (*)(const char*))0x950c8684,
-  (int32_t (*)(const uint16_t, uint32_t*, uint32_t*))0x97bb35db,
-  (EGLDisplay (*)(NativeDisplayType))0xabd36ff6,
-  (void (*)(void))0xadd96fb5,
-  (EGLBoolean (*)(EGLDisplay))0xb87f4317,
-  (DISPMANX_UPDATE_HANDLE_T (*)(int32_t))0xb8dfc099,
+  (int (*)(int))0xb88bf697,
   (uint32_t (*)(void))0xd1d0b104,
-  (EGLContext (*)(EGLDisplay, EGLConfig, EGLContext, EGLint const*))0xd95202a9,
-  (EGLBoolean (*)(EGLDisplay, EGLint const*, EGLConfig*, EGLint, EGLint*))0xf4628a23,
-  (EGLBoolean (*)(EGLDisplay, EGLSurface, EGLSurface, EGLContext))0xf780cac1,
+  (SDL_GLContext (*)(SDL_Window*))0xdba45bd,
 };
 #endif
 
@@ -293,7 +249,7 @@ typedef Elf32_Sym dnload_elf_sym_t;
 typedef Elf32_Sword dnload_elf_tag_t;
 #endif
 /** \brief ELF base address. */
-#define ELF_BASE_ADDRESS 0x10000
+#define ELF_BASE_ADDRESS 0x400000
 /** \brief Get dynamic section element by tag.
  *
  * \param dyn Dynamic section.
@@ -485,7 +441,7 @@ static void* dnload_find_symbol(uint32_t hash)
 static void dnload(void)
 {
   unsigned ii;
-  for(ii = 0; (21 > ii); ++ii)
+  for(ii = 0; (11 > ii); ++ii)
   {
     void **iter = ((void**)&g_symbol_table) + ii;
     *iter = dnload_find_symbol(*(uint32_t*)iter);
@@ -511,5 +467,5 @@ void _start() DNLOAD_VISIBILITY;
 }
 #endif
 #endif
-
 #endif
+

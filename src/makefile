@@ -2,8 +2,12 @@ TARGET=raeae
 ENTRY=main.c
 DNLOAD=~/programs/dnload/dnload.py
 PYTHON=python2.7
-CFLAGS=-g -fwhole-program -I/usr/include/SDL -I/opt/vc/include -DUSE_LD
-LFLAGS=-L/opt/vc/lib -lc -lSDL -lGLESv2 -lEGL -lbcm_host
+
+debug:CFLAGS=-g -fwhole-program -I/usr/include/SDL -I/opt/vc/include -DUSE_LD
+debug:LFLAGS=-L/opt/vc/lib -lc -lSDL -lGLESv2 -lEGL -lbcm_host
+
+debugnovc:CFLAGS=-g -fwhole-program -I/usr/include/SDL2 -DUSE_LD
+debugnovc:LFLAGS=-lc -lSDL2 -lGLESv2
 
 all:
 	make debug && make size
@@ -13,7 +17,11 @@ size:
 
 debug:
 	$(PYTHON) $(DNLOAD) -a sdl1 -v $(ENTRY)
-	g++ $(CFLAGS) main.c $(LFLAGS) -o $(TARGET).debug 
+	g++ $(CFLAGS) $(ENTRY) $(LFLAGS) -o $(TARGET).debug 
+
+debugnovc:
+	$(PYTHON) $(DNLOAD) -a sdl2 -v $(ENTRY)
+	g++ $(CFLAGS) $(ENTRY) $(LFLAGS) -o $(TARGET).debugnovc
 
 clean:
 	rm -f *.S *.o *.unprocessed *.stripped *.bin *.ld $(TARGET)*

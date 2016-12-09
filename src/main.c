@@ -19,14 +19,14 @@ void _start()
 {
     dnload();
 	dnload_puts("Kalteri Mafia rul3z while preparing the demo!!1");
-    dnload_SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER);
+    dnload_SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO);
 
     videoInit(G_VIDEO_X, G_VIDEO_Y);
 
     demoMainLoop();
 
     videoDeinit();
-    dnload_SDL_Quit();
+
     /* exit syscall */
 #ifdef USE_LD
     return 0;
