@@ -139,6 +139,7 @@ static void asm_exit(void)
 #define dnload_glClear glClear
 #define dnload_SDL_GL_SwapWindow SDL_GL_SwapWindow
 #define dnload_SDL_CreateWindow SDL_CreateWindow
+#define dnload_SDL_PollEvent SDL_PollEvent
 #define dnload_SDL_Init SDL_Init
 #define dnload_SDL_Quit SDL_Quit
 #define dnload_glClearColor glClearColor
@@ -153,6 +154,7 @@ static void asm_exit(void)
 #define dnload_glClear g_symbol_table.glClear
 #define dnload_SDL_GL_SwapWindow g_symbol_table.SDL_GL_SwapWindow
 #define dnload_SDL_CreateWindow g_symbol_table.SDL_CreateWindow
+#define dnload_SDL_PollEvent g_symbol_table.SDL_PollEvent
 #define dnload_SDL_Init g_symbol_table.SDL_Init
 #define dnload_SDL_Quit g_symbol_table.SDL_Quit
 #define dnload_glClearColor g_symbol_table.glClearColor
@@ -171,6 +173,7 @@ static struct SymbolTableStruct
   void (DNLOAD_APIENTRY *glClear)(GLbitfield);
   void (*SDL_GL_SwapWindow)(SDL_Window*);
   SDL_Window* (*SDL_CreateWindow)(const char*, int, int, int, int, Uint32);
+  int (*SDL_PollEvent)(SDL_Event*);
   int (*SDL_Init)(Uint32);
   void (*SDL_Quit)(void);
   void (DNLOAD_APIENTRY *glClearColor)(GLclampf, GLclampf, GLclampf, GLclampf);
@@ -184,6 +187,7 @@ static struct SymbolTableStruct
   (void (DNLOAD_APIENTRY *)(GLbitfield))0x1fd92088,
   (void (*)(SDL_Window*))0x295bfb59,
   (SDL_Window* (*)(const char*, int, int, int, int, Uint32))0x4fbea370,
+  (int (*)(SDL_Event*))0x64949d97,
   (int (*)(Uint32))0x70d6574,
   (void (*)(void))0x7eb657f3,
   (void (DNLOAD_APIENTRY *)(GLclampf, GLclampf, GLclampf, GLclampf))0x8c118fbb,
@@ -441,7 +445,7 @@ static void* dnload_find_symbol(uint32_t hash)
 static void dnload(void)
 {
   unsigned ii;
-  for(ii = 0; (11 > ii); ++ii)
+  for(ii = 0; (12 > ii); ++ii)
   {
     void **iter = ((void**)&g_symbol_table) + ii;
     *iter = dnload_find_symbol(*(uint32_t*)iter);

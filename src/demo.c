@@ -14,8 +14,15 @@ void demoMainLoop() {
     unsigned const FPS_TIME = 2000;
 #endif
 
+    SDL_Event event;
+
     dnload_glClearColor(0,0,0,1);
+
     while (gDemoRunning) {
+        dnload_SDL_PollEvent(&event);
+        if (event.type == SDL_KEYDOWN | event.type == SDL_QUIT)
+            gDemoRunning = 0;
+
         gCurTime = dnload_SDL_GetTicks();
         dnload_glClear(GL_COLOR_BUFFER_BIT);
         videoSwapBuffers();
