@@ -116,9 +116,9 @@ void synthInitSDL16() {
     want.callback = synthStreamCallback;
 
 #ifdef DNLOAD_VIDEOCORE
-    SDL_OpenAudio(&want, NULL);
+    dnload_SDL_OpenAudio(&want, NULL);
 #else
-    gSynthAudioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+    gSynthAudioDevice = dnload_SDL_OpenAudioDevice(NULL, 0, &want, &have, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
 #ifdef USE_LD
     if (want.format != have.format) {
         puts("Failed to get S16LSB audio");
@@ -153,9 +153,9 @@ void synthInit() {
 
 void synthStartStream() {
 #ifdef DNLOAD_VIDEOCORE
-    SDL_PauseAudio(0);
+    dnload_SDL_PauseAudio(0);
 #else
-    SDL_PauseAudioDevice(gSynthAudioDevice, 0);
+    dnload_SDL_PauseAudioDevice(gSynthAudioDevice, 0);
 #endif
 }
 

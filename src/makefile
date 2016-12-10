@@ -3,7 +3,7 @@ ENTRY=main.c
 DNLOAD=~/programs/dnload/dnload.py
 PYTHON=python2.7
 
-debug:CFLAGS=-g -fwhole-program -I/usr/include/SDL -I/opt/vc/include -DUSE_LD
+debug:CFLAGS=-g -fwhole-program -I/usr/include/SDL -I/opt/vc/include -DUSE_LD -DDNLOAD_VIDEOCORE
 debug:LFLAGS=-L/opt/vc/lib -lc -lSDL -lGLESv2 -lEGL -lbcm_host
 
 debugnovc:CFLAGS=-g -fwhole-program -I/usr/include/SDL2 -DUSE_LD
