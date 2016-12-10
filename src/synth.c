@@ -12,7 +12,7 @@ SDL_AudioDeviceID gSynthAudioDevice;
 #endif
 
 /* Note encoding copied from YROT, why change something that works? ;D */
-static char const *synthNotes[] = {
+static char const *gSynthNotes[] = {
     "c1", "C1", "d1", "D1", "e1", "f1", "F1", "g1", "G1", "a1", "A1", "b1",
     "c2", "C2", "d2", "D2", "e2", "f2", "F2", "g2", "G2", "a2", "A2", "b2",
     "c3", "C3", "d3", "D3", "e3", "f3", "F3", "g3", "G3", "a3", "A3", "b3",
@@ -22,7 +22,7 @@ static char const *synthNotes[] = {
     "0"
 };
 
-static float synthFreqs[(sizeof(synthNotes) / sizeof(synthNotes[0])) - 1];
+static float gSynthFreqs[(sizeof(gSynthNotes) / sizeof(gSynthNotes[0])) - 1];
 
 static int const      G_SYNTH_BASE_NOTE         = 12*3+10; /* n(notes) * n(octavesUndera4) + n(notesUndera4) */
 static unsigned const G_SYNTH_PEAK              = 0x7FFF; /*int16_t*/
@@ -73,16 +73,16 @@ void synthStreamCallback(void *userdata, uint8_t *stream, int len) {
 float noteFreq(char const *note) {
     int index;
     /* I know hashing would maybe be faster but this is fine for precalc synth */
-    for (index = 0; dnload_strcmp(note, synthNotes[index]) != 0; index++) {
+    for (index = 0; dnload_strcmp(note, gSynthNotes[index]) != 0; index++) {
         /* If no match found and end of note table, "0", is matched set index to a sane value and give up */
-        if (dnload_strcmp("0", synthNotes[index]) == 0) {
+        if (dnload_strcmp("0", gSynthNotes[index]) == 0) {
             index=0;
             break;
         }
     }
 
     /* These should be calcd in synthInit() */
-    return synthFreqs[index];
+    return gSynthFreqs[index];
 }
 
 /* Oscillators */
@@ -132,9 +132,10 @@ void synthInit() {
     int i;
 
     /* Calculate note frequencies */
-    for (i=0; i<(sizeof(synthFreqs)/sizeof(synthFreqs[0])); i++) {
+    for (i=0; i<(sizeof(gSynthFreqs)/sizeof(gSynthFreqs[0])); i++) {
         /* http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html */
-        synthFreqs[i] = G_SYNTH_TUNE * dnload_powf(dnload_powf(2.f, 1.f/12.f), (float)(i-G_SYNTH_BASE_NOTE));
+        /* Add 1 because 0 is array index origin */
+        gSynthFreqs[i] = G_SYNTH_TUNE * dnload_powf(dnload_powf(2.f, 1.f/12.f), (float)(i-G_SYNTH_BASE_NOTE+1));
     }
 
     /* Calculate song PCM buffer */
