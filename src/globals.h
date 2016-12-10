@@ -7,5 +7,7 @@ static int const        G_VIDEO_Y = 720;
 static unsigned         gCurTime = 0;
 /* Trying to have all times in msec because of SDL */
 static unsigned const   G_DEMO_LENGTH = 60*1000;
+/* Because M_PI isn't standard */
+static float const      G_PI = 3.14159265;
 
 #endif

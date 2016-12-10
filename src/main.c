@@ -21,6 +21,9 @@ void _start()
 	dnload_puts("Kalteri Mafia rul3z while preparing the demo!!1");
     dnload_SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO);
 
+    /* Precalc music, set up sound playblack */
+    synthInit();
+
     videoInit(G_VIDEO_X, G_VIDEO_Y);
 
     /* Passing start time for accurate timing */

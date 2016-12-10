@@ -18,6 +18,9 @@ void demoMainLoop(unsigned start) {
 
     dnload_glClearColor(0,0,0,1);
 
+    /* Ready to rock and roll, start the music now */
+    synthStartStream();
+
     while (gDemoRunning) {
         dnload_SDL_PollEvent(&event);
         if (event.type == SDL_KEYDOWN | event.type == SDL_QUIT)
