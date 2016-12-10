@@ -6,7 +6,7 @@
 #ifndef DEMO_C
 #define DEMO_C
 
-void demoMainLoop() {
+void demoMainLoop(unsigned start) {
 #ifdef USE_LD
     /* FPS counter vars */
     unsigned fpsTimePrint = 0;
@@ -23,13 +23,13 @@ void demoMainLoop() {
         if (event.type == SDL_KEYDOWN | event.type == SDL_QUIT)
             gDemoRunning = 0;
 
-        gCurTime = dnload_SDL_GetTicks();
+        gCurTime = dnload_SDL_GetTicks()-start;
         dnload_glClear(GL_COLOR_BUFFER_BIT);
         videoSwapBuffers();
 
 #ifdef USE_LD
         /* Count and print FPS */
-        if (fpsTimePrint + FPS_TIME > gCurTime) {
+        if (fpsTimePrint + FPS_TIME < gCurTime) {
             printf("FPS: %f\n", (float)fpsFrames/((float)FPS_TIME/1000.0f));
             fpsTimePrint = gCurTime;
             fpsFrames=0;
