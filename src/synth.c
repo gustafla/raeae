@@ -11,7 +11,7 @@
 SDL_AudioDeviceID gSynthAudioDevice;
 #endif
 
-static unsigned const G_SYNTH_PEAK              = 0xFFFF;
+static unsigned const G_SYNTH_PEAK              = 0x7FFF; /*int16_t*/
 
 static unsigned const G_SYNTH_AUDIO_RATE        = 44100;
 static unsigned const G_SYNTH_AUDIO_CHANNELS    = 2;
@@ -54,20 +54,20 @@ void synthStreamCallback(void *userdata, uint8_t *stream, int len) {
 }
 
 void synthPlay16(uint8_t *buf, unsigned pos /* Position in samples */) {
-    uint16_t l, r;
+    int16_t l, r;
     unsigned period;
     float t = (float)pos/(float)G_SYNTH_AUDIO_RATE;
     
     /* Gen test audio... */
     period = G_SYNTH_AUDIO_RATE/440;
-    l = ((pos % period) > (period/2) ? G_SYNTH_PEAK : 0);
-    r = ((pos % period) > (period/2) ? G_SYNTH_PEAK : 0);
+    l = ((pos % period) > (period/2) ? G_SYNTH_PEAK : -G_SYNTH_PEAK);
+    r = l;
 
     /* Slice the samples into the buffer */
-    buf[pos]    = l         & 0xff;
-    buf[pos+1]  = (l >> 8)  & 0xff;
-    buf[pos+2]  = r         & 0xff;
-    buf[pos+3]  = (r >> 8)  & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH]     = l         & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 1] = (l >> 8)  & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 2] = r         & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 3] = (r >> 8)  & 0xff;
 }
 
 void synthInitSDL16() {
@@ -75,7 +75,7 @@ void synthInitSDL16() {
     SDL_AudioSpec want, have;
     /*dnload_SDL_memset(&want, 0, sizeof(want));*/
     want.freq = G_SYNTH_AUDIO_RATE;
-    want.format = AUDIO_U16LSB;
+    want.format = AUDIO_S16LSB;
     want.channels = G_SYNTH_AUDIO_CHANNELS;
     want.samples = 4096;
     want.callback = synthStreamCallback;
@@ -84,6 +84,11 @@ void synthInitSDL16() {
     SDL_OpenAudio(&want, NULL);
 #else
     gSynthAudioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+#ifdef USE_LD
+    if (want.format != have.format) {
+        puts("Failed to get S16LSB audio");
+    }
+#endif
 #endif
 }
 
