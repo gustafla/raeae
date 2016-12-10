@@ -138,12 +138,15 @@ static void asm_exit(void)
 #define dnload_SDL_GL_SetAttribute SDL_GL_SetAttribute
 #define dnload_glClear glClear
 #define dnload_SDL_GL_SwapWindow SDL_GL_SwapWindow
+#define dnload_memcpy memcpy
 #define dnload_SDL_CreateWindow SDL_CreateWindow
 #define dnload_SDL_PollEvent SDL_PollEvent
 #define dnload_SDL_Init SDL_Init
 #define dnload_SDL_Quit SDL_Quit
 #define dnload_glClearColor glClearColor
+#define dnload_powf powf
 #define dnload_puts puts
+#define dnload_strcmp strcmp
 #define dnload_SDL_ShowCursor SDL_ShowCursor
 #define dnload_SDL_GetTicks SDL_GetTicks
 #define dnload_SDL_GL_CreateContext SDL_GL_CreateContext
@@ -153,12 +156,15 @@ static void asm_exit(void)
 #define dnload_SDL_GL_SetAttribute g_symbol_table.SDL_GL_SetAttribute
 #define dnload_glClear g_symbol_table.glClear
 #define dnload_SDL_GL_SwapWindow g_symbol_table.SDL_GL_SwapWindow
+#define dnload_memcpy g_symbol_table.memcpy
 #define dnload_SDL_CreateWindow g_symbol_table.SDL_CreateWindow
 #define dnload_SDL_PollEvent g_symbol_table.SDL_PollEvent
 #define dnload_SDL_Init g_symbol_table.SDL_Init
 #define dnload_SDL_Quit g_symbol_table.SDL_Quit
 #define dnload_glClearColor g_symbol_table.glClearColor
+#define dnload_powf g_symbol_table.powf
 #define dnload_puts g_symbol_table.puts
+#define dnload_strcmp g_symbol_table.strcmp
 #define dnload_SDL_ShowCursor g_symbol_table.SDL_ShowCursor
 #define dnload_SDL_GetTicks g_symbol_table.SDL_GetTicks
 #define dnload_SDL_GL_CreateContext g_symbol_table.SDL_GL_CreateContext
@@ -172,12 +178,15 @@ static struct SymbolTableStruct
   int (*SDL_GL_SetAttribute)(SDL_GLattr, int);
   void (DNLOAD_APIENTRY *glClear)(GLbitfield);
   void (*SDL_GL_SwapWindow)(SDL_Window*);
+  void* (*memcpy)(void*, const void*, size_t);
   SDL_Window* (*SDL_CreateWindow)(const char*, int, int, int, int, Uint32);
   int (*SDL_PollEvent)(SDL_Event*);
   int (*SDL_Init)(Uint32);
   void (*SDL_Quit)(void);
   void (DNLOAD_APIENTRY *glClearColor)(GLclampf, GLclampf, GLclampf, GLclampf);
+  float (*powf)(float, float);
   int (*puts)(const char*);
+  int (*strcmp)(const char*, const char*);
   int (*SDL_ShowCursor)(int);
   uint32_t (*SDL_GetTicks)(void);
   SDL_GLContext (*SDL_GL_CreateContext)(SDL_Window*);
@@ -186,12 +195,15 @@ static struct SymbolTableStruct
   (int (*)(SDL_GLattr, int))0x1da21ab0,
   (void (DNLOAD_APIENTRY *)(GLbitfield))0x1fd92088,
   (void (*)(SDL_Window*))0x295bfb59,
+  (void* (*)(void*, const void*, size_t))0x3dbddf77,
   (SDL_Window* (*)(const char*, int, int, int, int, Uint32))0x4fbea370,
   (int (*)(SDL_Event*))0x64949d97,
   (int (*)(Uint32))0x70d6574,
   (void (*)(void))0x7eb657f3,
   (void (DNLOAD_APIENTRY *)(GLclampf, GLclampf, GLclampf, GLclampf))0x8c118fbb,
+  (float (*)(float, float))0x921b2a2e,
   (int (*)(const char*))0x950c8684,
+  (int (*)(const char*, const char*))0xa640caf5,
   (int (*)(int))0xb88bf697,
   (uint32_t (*)(void))0xd1d0b104,
   (SDL_GLContext (*)(SDL_Window*))0xdba45bd,
@@ -445,7 +457,7 @@ static void* dnload_find_symbol(uint32_t hash)
 static void dnload(void)
 {
   unsigned ii;
-  for(ii = 0; (12 > ii); ++ii)
+  for(ii = 0; (15 > ii); ++ii)
   {
     void **iter = ((void**)&g_symbol_table) + ii;
     *iter = dnload_find_symbol(*(uint32_t*)iter);

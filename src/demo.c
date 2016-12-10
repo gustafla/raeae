@@ -16,17 +16,17 @@ void demoMainLoop(unsigned start) {
 
     SDL_Event event;
 
-    dnload_glClearColor(0,0,0,1);
+    dnload_glClearColor(1,0,0,1);
 
     /* Ready to rock and roll, start the music now */
     synthStartStream();
 
     while (gDemoRunning) {
+        gCurTime = dnload_SDL_GetTicks()-start;
         dnload_SDL_PollEvent(&event);
-        if (event.type == SDL_KEYDOWN | event.type == SDL_QUIT)
+        if (event.type == SDL_KEYDOWN | event.type == SDL_QUIT | gCurTime>G_DEMO_LENGTH)
             gDemoRunning = 0;
 
-        gCurTime = dnload_SDL_GetTicks()-start;
         dnload_glClear(GL_COLOR_BUFFER_BIT);
         videoSwapBuffers();
 

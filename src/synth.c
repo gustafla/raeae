@@ -11,7 +11,22 @@
 SDL_AudioDeviceID gSynthAudioDevice;
 #endif
 
+/* Note encoding copied from YROT, why change something that works? ;D */
+static char const *synthNotes[] = {
+    "c1", "C1", "d1", "D1", "e1", "f1", "F1", "g1", "G1", "a1", "A1", "b1",
+    "c2", "C2", "d2", "D2", "e2", "f2", "F2", "g2", "G2", "a2", "A2", "b2",
+    "c3", "C3", "d3", "D3", "e3", "f3", "F3", "g3", "G3", "a3", "A3", "b3",
+    "c4", "C4", "d4", "D4", "e4", "f4", "F4", "g4", "G4", "a4", "A4", "b4",
+    "c5", "C5", "d5", "D5", "e5", "f5", "F5", "g5", "G5", "a5", "A5", "b5",
+    "c6", "C6", "d6", "D6", "e6", "f6", "F6", "g6", "G6", "a6", "A6", "b6",
+    "0"
+};
+
+static float synthFreqs[(sizeof(synthNotes) / sizeof(synthNotes[0])) - 1];
+
+static int const      G_SYNTH_BASE_NOTE         = 12*3+10; /* n(notes) * n(octavesUndera4) + n(notesUndera4) */
 static unsigned const G_SYNTH_PEAK              = 0x7FFF; /*int16_t*/
+static float const    G_SYNTH_TUNE              = 440.f;
 
 static unsigned const G_SYNTH_AUDIO_RATE        = 44100;
 static unsigned const G_SYNTH_AUDIO_CHANNELS    = 2;
@@ -31,6 +46,7 @@ static struct {
     uint8_t *pos = gSynthAudioStream;
 } gSynthPlayback;
 
+/* Buffer fill callback for SDL */
 void synthStreamCallback(void *userdata, uint8_t *stream, int len) {
     unsigned i, offset;
     /* Don't play if empty */
@@ -41,10 +57,10 @@ void synthStreamCallback(void *userdata, uint8_t *stream, int len) {
     len = (len > gSynthPlayback.len ? gSynthPlayback.len : len);
 
     /* All data is premixed, just copy */
-    /*dnload_memcpy((void*)stream, (void*)gSynthPlayback.pos, len); */
-    for (i=0; i<len; i++) {
+    dnload_memcpy((void*)stream, (void*)gSynthPlayback.pos, len);
+    /*for (i=0; i<len; i++) {
         stream[i] = gSynthPlayback.pos[i];
-    }
+    }*/
 
     /* Move to next samples */
     gSynthPlayback.pos += len;
@@ -53,15 +69,34 @@ void synthStreamCallback(void *userdata, uint8_t *stream, int len) {
     gSynthPlayback.len -= len;
 }
 
+/* Find from note string */
+float noteFreq(char const *note) {
+    int index;
+    /* I know hashing would maybe be faster but this is fine for precalc synth */
+    for (index = 0; dnload_strcmp(note, synthNotes[index]) != 0; index++) {
+        /* If no match found and end of note table, "0", is matched set index to a sane value and give up */
+        if (dnload_strcmp("0", synthNotes[index]) == 0) {
+            index=0;
+            break;
+        }
+    }
+
+    /* These should be calcd in synthInit() */
+    return synthFreqs[index];
+}
+
+/* Oscillators */
+int16_t synthOscSquare(unsigned pos, float freq) {
+    /* Period time in samples */
+    unsigned period = (unsigned)((float)G_SYNTH_AUDIO_RATE/freq);
+    return (pos % period > period / 2 ? G_SYNTH_PEAK : -G_SYNTH_PEAK);
+}
+
 void synthPlay16(uint8_t *buf, unsigned pos /* Position in samples */) {
     int16_t l, r;
-    unsigned period;
-    float t = (float)pos/(float)G_SYNTH_AUDIO_RATE;
     
     /* Gen test audio... */
-    period = G_SYNTH_AUDIO_RATE/440;
-    l = ((pos % period) > (period/2) ? G_SYNTH_PEAK : -G_SYNTH_PEAK);
-    r = l;
+    r = l = synthOscSquare(pos, noteFreq("c4"));
 
     /* Slice the samples into the buffer */
     buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH]     = l         & 0xff;
@@ -93,14 +128,23 @@ void synthInitSDL16() {
 }
 
 void synthInit() {
-    /* Position in samples */
-    unsigned pos;
+    unsigned pos; /* Position in samples */
+    int i;
+
+    /* Calculate note frequencies */
+    for (i=0; i<(sizeof(synthFreqs)/sizeof(synthFreqs[0])); i++) {
+        /* http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html */
+        synthFreqs[i] = G_SYNTH_TUNE * dnload_powf(dnload_powf(2.f, 1.f/12.f), (float)(i-G_SYNTH_BASE_NOTE));
+    }
+
+    /* Calculate song PCM buffer */
     for (pos=0; pos < G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT; pos++) {
         synthPlay16(gSynthAudioStream, pos);
     }
 
 #ifdef USE_LD
     puts("Synth render done.");
+    printf("Synth c4 is: %f\n", noteFreq("c4"));
 #endif
 
     synthInitSDL16();
