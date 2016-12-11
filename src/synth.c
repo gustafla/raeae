@@ -1,15 +1,32 @@
+/* Design notes:
+    
+    arbitrary number of instruments that have a waveform and ADSR parameters
+    note progressions, or "patterns" are arbitrary as well, have some sym for no change
+    tracks or channels just list pattern nums arbitrarily
+    have all song data in a string and process it using strtok and atoi, basically copy YROT
+    keep audio floating point until final mixdown where converted to int16_t
+    JUST BASICALLY COPY YROT XD
+
+*/
+
 #ifndef SYNTH_C
 #define SYNTH_C
+
+#define ARRAY_LEN(x) (sizeof(x)/sizeof((x)[0]))
 
 #include "globals.h"
 #include <math.h>
 #include <string.h>
 #include <SDL.h>
 #include <limits.h>
+#include "song.c"
 
 #ifndef DNLOAD_VIDEOCORE
 SDL_AudioDeviceID gSynthAudioDevice;
 #endif
+
+/* Note strings will be compiled to a list of indices to the freq table in synthInit() */
+/*static signed const gSynthSq1Notes[sizeof(songsq1)/sizeof(songsq1[0])];*/
 
 /* Note encoding copied from YROT, why change something that works? ;D */
 static char const *gSynthNotes[] = {
@@ -32,7 +49,7 @@ static unsigned const G_SYNTH_AUDIO_RATE        = 44100;
 static unsigned const G_SYNTH_AUDIO_CHANNELS    = 2;
 static unsigned const G_SYNTH_AUDIO_DEPTH       = 2;
 
-static unsigned const G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT = (G_DEMO_LENGTH/1000) * G_SYNTH_AUDIO_RATE;
+static unsigned const G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT = (unsigned)(G_DEMO_LENGTH/G_DEMO_TIMESCALE) * G_SYNTH_AUDIO_RATE;
 static unsigned const G_SYNTH_AUDIO_STREAM_SIZE = (
     G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH
 );
@@ -69,42 +86,7 @@ void synthStreamCallback(void *userdata, uint8_t *stream, int len) {
     gSynthPlayback.len -= len;
 }
 
-/* Find from note string */
-float noteFreq(char const *note) {
-    int index;
-    /* I know hashing would maybe be faster but this is fine for precalc synth */
-    for (index = 0; dnload_strcmp(note, gSynthNotes[index]) != 0; index++) {
-        /* If no match found and end of note table, "0", is matched set index to a sane value and give up */
-        if (dnload_strcmp("0", gSynthNotes[index]) == 0) {
-            index=0;
-            break;
-        }
-    }
-
-    /* These should be calcd in synthInit() */
-    return gSynthFreqs[index];
-}
-
-/* Oscillators */
-int16_t synthOscSquare(unsigned pos, float freq) {
-    /* Period time in samples */
-    unsigned period = (unsigned)((float)G_SYNTH_AUDIO_RATE/freq);
-    return (pos % period > period / 2 ? G_SYNTH_PEAK : -G_SYNTH_PEAK);
-}
-
-void synthPlay16(uint8_t *buf, unsigned pos /* Position in samples */) {
-    int16_t l, r;
-    
-    /* Gen test audio... */
-    r = l = synthOscSquare(pos, noteFreq("c4"));
-
-    /* Slice the samples into the buffer */
-    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH]     = l         & 0xff;
-    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 1] = (l >> 8)  & 0xff;
-    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 2] = r         & 0xff;
-    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 3] = (r >> 8)  & 0xff;
-}
-
+/* Open SDL audio playback */
 void synthInitSDL16() {
     /* These are hardcoded to the synth... */
     SDL_AudioSpec want, have;
@@ -127,16 +109,82 @@ void synthInitSDL16() {
 #endif
 }
 
+/* Oscillators */
+int16_t synthOscSquare(unsigned pos, float freq) {
+    /* Period time in samples */
+    unsigned period = (unsigned)((float)G_SYNTH_AUDIO_RATE/freq);
+    return (pos % period > period / 2 ? G_SYNTH_PEAK : -G_SYNTH_PEAK);
+}
+
+/* Find from note string */
+unsigned synthNoteIndex(char const *note) {
+    unsigned index;
+    /* I know hashing would maybe be faster but this is fine for precalc synth PoC */
+    for (index = 0; dnload_strcmp(note, gSynthNotes[index]) != 0; index++) {
+        /* If no match found and end of note table, "0", is matched set index to a sane value and give up */
+        if (dnload_strcmp("0", gSynthNotes[index]) == 0) {
+            index=0;
+            break;
+        }
+    }
+
+    return index;
+}
+
+float synthNoteFreq(char const *note) {
+    /* These should be calcd in synthInit() */
+    return gSynthFreqs[synthNoteIndex(note)];
+}
+
+/* Return note index from notes that corresponds to pos and tempo */
+unsigned synthSeq(unsigned pos) {
+    /* Work out which beat pos is at */
+    float const bps = songbpm/60.f;
+    float const beatTime = 1.f/bps;
+    unsigned beatTimeSamples = (unsigned)(beatTime * (float)G_SYNTH_AUDIO_RATE);
+    unsigned beatNum = pos/beatTimeSamples;
+
+    /* Limit beat num to known sane values and return it, rest is done by mixer */
+    return (beatNum < 0 ? 0 : beatNum);
+}
+
+int16_t synthMix(unsigned pos /* in samples */) {
+    unsigned seqPos = synthSeq(pos);
+
+    unsigned sq1Len = ARRAY_LEN(songsq1);
+    return synthOscSquare(pos, synthNoteFreq(songsq1[seqPos > sq1Len-1 ? sq1Len-1 : seqPos]));
+}
+
+void synthPlay16(uint8_t *buf, unsigned pos /* Position in samples */) {
+    int16_t l, r;
+    
+    /* Get audio... */
+    r = l = synthMix(pos);
+
+    /* Slice the samples into the buffer */
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH]     = l         & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 1] = (l >> 8)  & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 2] = r         & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 3] = (r >> 8)  & 0xff;
+}
+
+
 void synthInit() {
     unsigned pos; /* Position in samples */
     int i;
 
     /* Calculate note frequencies */
-    for (i=0; i<(sizeof(gSynthFreqs)/sizeof(gSynthFreqs[0])); i++) {
+    for (i=0; i<ARRAY_LEN(gSynthFreqs); i++) {
         /* http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html */
         /* Add 1 because 0 is array index origin */
         gSynthFreqs[i] = G_SYNTH_TUNE * dnload_powf(dnload_powf(2.f, 1.f/12.f), (float)(i-G_SYNTH_BASE_NOTE+1));
     }
+
+    /* Compile song notes to freq indices for all channels */
+    /*for (i=0; i<(sizeof(songsq1)/sizeof(songsq1[0])); i++) {
+        gSynthSq1Notes[i] = noteIndex(songsq1[i]);
+    }*/
+    /* Add more channels here... */
 
     /* Calculate song PCM buffer */
     for (pos=0; pos < G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT; pos++) {
@@ -145,7 +193,7 @@ void synthInit() {
 
 #ifdef USE_LD
     puts("Synth render done.");
-    printf("Synth c4 is: %f\n", noteFreq("c4"));
+    printf("Synth c4 is: %f\n", synthNoteFreq("c4"));
 #endif
 
     synthInitSDL16();

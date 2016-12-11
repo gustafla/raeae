@@ -7,6 +7,7 @@
 #define DEMO_C
 
 void demoMainLoop(unsigned start) {
+    unsigned realTime=0;
 #ifdef USE_LD
     /* FPS counter vars */
     unsigned fpsTimePrint = 0;
@@ -22,7 +23,11 @@ void demoMainLoop(unsigned start) {
     synthStartStream();
 
     while (gDemoRunning) {
-        gCurTime = dnload_SDL_GetTicks()-start;
+        /* realTime is local and contains time in msec */
+        realTime = dnload_SDL_GetTicks()-start;
+        /* gCurTime is global and contains time in musical beats */
+        gCurTime = ((float)realTime / 1000.f) * G_DEMO_TIMESCALE;
+
         dnload_SDL_PollEvent(&event);
         if (event.type == SDL_KEYDOWN | event.type == SDL_QUIT | gCurTime>G_DEMO_LENGTH)
             gDemoRunning = 0;
@@ -32,9 +37,9 @@ void demoMainLoop(unsigned start) {
 
 #ifdef USE_LD
         /* Count and print FPS */
-        if (fpsTimePrint + FPS_TIME < gCurTime) {
+        if (fpsTimePrint + FPS_TIME < realTime) {
             printf("FPS: %f\n", (float)fpsFrames/((float)FPS_TIME/1000.0f));
-            fpsTimePrint = gCurTime;
+            fpsTimePrint = realTime;
             fpsFrames=0;
         } else {
             fpsFrames++;
