@@ -171,6 +171,7 @@ void synthPlay16(uint8_t *buf, unsigned pos /* Position in samples */) {
 
 void synthInit() {
     unsigned pos; /* Position in samples */
+    unsigned const PRINT_BLK = 4096;
     int i;
 
     /* Calculate note frequencies */
@@ -189,7 +190,14 @@ void synthInit() {
     /* Calculate song PCM buffer */
     for (pos=0; pos < G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT; pos++) {
         synthPlay16(gSynthAudioStream, pos);
+
+        /* Rudimentary progress indicator */
+        if (pos % PRINT_BLK == 0) {
+            dnload_printf("\rMusic precalc: %i%%", (int)(100.f * ((float)pos / (float)G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT)));
+        }
     }
+    /* Change line from progress indicator */
+    dnload_printf("\n");
 
 #ifdef USE_LD
     puts("Synth render done.");
