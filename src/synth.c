@@ -127,7 +127,7 @@ void synthInit() {
     for (i=0; i<ARRAY_LEN(gSynthFreqs); i++) {
         /* http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html */
         /* Add 1 because 0 is array index origin */
-        gSynthFreqs[i] = G_SYNTH_TUNE * dnload_powf(dnload_powf(2.f, 1.f/12.f), (float)(i-G_SYNTH_BASE_NOTE+1));
+        gSynthFreqs[i] = G_SYNTH_TUNE * dnload_powf(1.05946309f, (float)(i-G_SYNTH_BASE_NOTE+1));
     }
 
     /* Compile song notes to freq indices for all channels */
