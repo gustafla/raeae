@@ -9,4 +9,4 @@
         "c4", "a4", "f4"
     };
 
-#endif
+#endif /* SONG_C */

@@ -1,3 +1,6 @@
+#ifndef VIDEO_C
+#define VIDEO_C
+
 #include "dnload.h"
 
 #ifdef DNLOAD_VIDEOCORE
@@ -10,8 +13,6 @@
 /* Covers both SDLs, makefile decides Iflag */
 #include <SDL.h>
 
-#ifndef VIDEO_C
-#define VIDEO_C
 
 #ifndef DNLOAD_VIDEOCORE
 static SDL_Window *gVideoSDLWindow;
@@ -49,4 +50,4 @@ void videoDeinit() {
     dnload_SDL_Quit();
 }
 
-#endif
+#endif /* VIDEO_C */

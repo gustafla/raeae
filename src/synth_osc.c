@@ -1,6 +1,8 @@
 #ifndef SYNTH_OSC_C
 #define SYNTH_OSC_C
 
+#include "synth.h"
+
 /* Oscillators */
 int16_t synthOscSquare(unsigned pos, float freq) {
     /* Period time in samples */

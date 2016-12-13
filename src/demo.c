@@ -1,10 +1,10 @@
+#ifndef DEMO_C
+#define DEMO_C
+
 #include "dnload.h"
 #include "globals.h"
 #include "video.c"
 #include <stdio.h>
-
-#ifndef DEMO_C
-#define DEMO_C
 
 void demoMainLoop(unsigned start) {
     unsigned realTime=0;
@@ -48,4 +48,4 @@ void demoMainLoop(unsigned start) {
     }
 }
 
-#endif
+#endif /* DEMO_C */
