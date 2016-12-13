@@ -82,35 +82,39 @@ float synthNoteFreq(char const *note) {
 }
 
 /* Return note index from notes that corresponds to pos and tempo */
-unsigned synthSeq(unsigned pos) {
+unsigned synthSeq(float t) {
     /* Work out which beat pos is at */
-    float const bps = songbpm/60.f;
+    float const bps = songbpm/60.f; /* SONGBPM REF CHANGEME */
     float const beatTime = 1.f/bps;
-    unsigned beatTimeSamples = (unsigned)(beatTime * (float)G_SYNTH_AUDIO_RATE);
-    unsigned beatNum = pos/beatTimeSamples;
+    unsigned beatNum = (unsigned)(t/beatTime); /* Relying on float->int truncation */
 
     /* Limit beat num to known sane values and return it, rest is done by mixer */
     return (beatNum < 0 ? 0 : beatNum);
 }
 
-int16_t synthMix(unsigned pos /* in samples */) {
-    unsigned seqPos = synthSeq(pos);
+float synthMix(float t) { /* CHANGEME */
+    unsigned seqPos = synthSeq(t);
 
     unsigned sq1Len = ARRAY_LEN(songsq1);
-    return synthOscSquare(pos, synthNoteFreq(songsq1[seqPos > sq1Len-1 ? sq1Len-1 : seqPos]));
+    return synthOscSquare(t, synthNoteFreq(songsq1[seqPos > sq1Len-1 ? sq1Len-1 : seqPos]));
 }
 
 void synthPlay16(uint8_t *buf, unsigned pos /* Position in samples */) {
-    int16_t l, r;
+    int16_t lS16, rS16;
+    float l, r;
     
     /* Get audio... */
-    r = l = synthMix(pos);
+    r = l = synthMix((float)pos / (float)G_SYNTH_AUDIO_RATE); /* Convert sample pos to time */
+
+    /* Convert floating point to S16 */
+    lS16 = (unsigned)((l * 2.f - 1.f) * (float)G_SYNTH_PEAK);
+    rS16 = (unsigned)((r * 2.f - 1.f) * (float)G_SYNTH_PEAK);
 
     /* Slice the samples into the buffer */
-    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH]     = l         & 0xff;
-    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 1] = (l >> 8)  & 0xff;
-    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 2] = r         & 0xff;
-    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 3] = (r >> 8)  & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH]     = lS16         & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 1] = (lS16 >> 8)  & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 2] = rS16         & 0xff;
+    buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH + 3] = (rS16 >> 8)  & 0xff;
 }
 
 

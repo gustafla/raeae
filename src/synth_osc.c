@@ -2,12 +2,15 @@
 #define SYNTH_OSC_C
 
 #include "synth.h"
+#include "math.h"
 
-/* Oscillators */
-int16_t synthOscSquare(unsigned pos, float freq) {
-    /* Period time in samples */
-    unsigned period = (unsigned)((float)G_SYNTH_AUDIO_RATE/freq);
-    return (pos % period > period / 2 ? G_SYNTH_PEAK : -G_SYNTH_PEAK);
+/* Oscillators produce floating point audio from 0 to 1 */
+
+/* Square wave */
+float synthOscSquare(float t, float f) {
+    /* Period time */
+    float pt = 1.f / f;
+    return (dnload_fmodf(t, pt) > pt / 2.f ? 1.f : 0.f);
 }
 
 #endif /* SYNTH_OSC_C */

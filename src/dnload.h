@@ -136,6 +136,7 @@ static void asm_exit(void)
 #if defined(USE_LD)
 /** \cond */
 #define dnload_bcm_host_init bcm_host_init
+#define dnload_fmodf fmodf
 #define dnload_eglInitialize eglInitialize
 #define dnload_glClear glClear
 #define dnload_eglCreateWindowSurface eglCreateWindowSurface
@@ -169,6 +170,7 @@ static void asm_exit(void)
 #else
 /** \cond */
 #define dnload_bcm_host_init g_symbol_table.bcm_host_init
+#define dnload_fmodf g_symbol_table.fmodf
 #define dnload_eglInitialize g_symbol_table.eglInitialize
 #define dnload_glClear g_symbol_table.glClear
 #define dnload_eglCreateWindowSurface g_symbol_table.eglCreateWindowSurface
@@ -206,6 +208,7 @@ static void asm_exit(void)
 static struct SymbolTableStruct
 {
   void (*bcm_host_init)(void);
+  float (*fmodf)(float, float);
   EGLBoolean (*eglInitialize)(EGLDisplay, EGLint*, EGLint*);
   void (DNLOAD_APIENTRY *glClear)(GLbitfield);
   EGLSurface (*eglCreateWindowSurface)(EGLDisplay, EGLConfig, EGLNativeWindowType, EGLint const*);
@@ -238,6 +241,7 @@ static struct SymbolTableStruct
 } g_symbol_table =
 {
   (void (*)(void))0x152389b4,
+  (float (*)(float, float))0x16a18daa,
   (EGLBoolean (*)(EGLDisplay, EGLint*, EGLint*))0x1e979dfa,
   (void (DNLOAD_APIENTRY *)(GLbitfield))0x1fd92088,
   (EGLSurface (*)(EGLDisplay, EGLConfig, EGLNativeWindowType, EGLint const*))0x28e70577,
@@ -517,7 +521,7 @@ static void* dnload_find_symbol(uint32_t hash)
 static void dnload(void)
 {
   unsigned ii;
-  for(ii = 0; (30 > ii); ++ii)
+  for(ii = 0; (31 > ii); ++ii)
   {
     void **iter = ((void**)&g_symbol_table) + ii;
     *iter = dnload_find_symbol(*(uint32_t*)iter);
