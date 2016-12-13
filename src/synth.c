@@ -107,8 +107,8 @@ void synthPlay16(uint8_t *buf, unsigned pos /* Position in samples */) {
     r = l = synthMix((float)pos / (float)G_SYNTH_AUDIO_RATE); /* Convert sample pos to time */
 
     /* Convert floating point to S16 */
-    lS16 = (unsigned)((l * 2.f - 1.f) * (float)G_SYNTH_PEAK);
-    rS16 = (unsigned)((r * 2.f - 1.f) * (float)G_SYNTH_PEAK);
+    lS16 = (unsigned)(l * (float)G_SYNTH_PEAK);
+    rS16 = (unsigned)(r * (float)G_SYNTH_PEAK);
 
     /* Slice the samples into the buffer */
     buf[pos * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH]     = lS16         & 0xff;
