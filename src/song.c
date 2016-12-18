@@ -1,12 +1,14 @@
 #ifndef SONG_C
 #define SONG_C
 
-    /* Tempo */
-    float const songbpm = 40.f;
+/* Not const to use strtok */
+static char gSongFile[] =
+"bpm:60\n"
 
-    /* Square channel notes */
-    char const *songsq1[] = {
-        "c4", "a4", "f4"
-    };
+"i0:sq,100\n"
+
+"p0:c4,a4,g3\n"
+    
+"t0:0,loop\n";
 
 #endif /* SONG_C */

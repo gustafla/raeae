@@ -38,7 +38,7 @@ static unsigned const G_SYNTH_AUDIO_RATE        = 44100;
 static unsigned const G_SYNTH_AUDIO_CHANNELS    = 2;
 static unsigned const G_SYNTH_AUDIO_DEPTH       = 2;
 
-static unsigned const G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT = (unsigned)(G_DEMO_LENGTH/G_DEMO_TIMESCALE) * G_SYNTH_AUDIO_RATE;
+static unsigned const G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT = (unsigned)(G_DEMO_LENGTH) * G_SYNTH_AUDIO_RATE;
 static unsigned const G_SYNTH_AUDIO_STREAM_SIZE = (
     G_SYNTH_AUDIO_STREAM_SAMPLE_COUNT * G_SYNTH_AUDIO_CHANNELS * G_SYNTH_AUDIO_DEPTH
 );
@@ -51,5 +51,34 @@ static struct {
     uint32_t len = G_SYNTH_AUDIO_STREAM_SIZE;
     uint8_t *pos = gSynthAudioStream;
 } gSynthPlayback;
+
+static unsigned const G_SYNTH_MAX_INSTRUMENTS = 16;
+static unsigned const G_SYNTH_MAX_PATTERNS = 16;
+static unsigned const G_SYNTH_MAX_LEN_PATTERN = 64;
+static unsigned const G_SYNTH_MAX_TRACKS = 16;
+static unsigned const G_SYNTH_MAX_LEN_TRACK = 32;
+enum SYNTH_PATTERN_TRACK_CONTROL {END = -2, LOOP = -3};
+
+typedef struct _SynthInstrument {
+    /* Not gonna bother with an intermediate format, just point to the func really */
+    float (*waveform)(float,float);
+    float volume;
+} SynthInstrument;
+
+static struct {
+    int bpm;
+
+    SynthInstrument instruments[G_SYNTH_MAX_INSTRUMENTS];
+
+    /* Initialize patterns and tracks to each have END as the first element before synthLoadSong */
+    /* indices to gSynthFreqs */
+    int patterns[G_SYNTH_MAX_PATTERNS][G_SYNTH_MAX_LEN_PATTERN];
+    /* indices to patterns */
+    int tracks[G_SYNTH_MAX_TRACKS][G_SYNTH_MAX_LEN_TRACK];
+    /* Plays patterns[tracks[n][it]][ip] with instruments[n] */
+
+} gSynthSongData;
+
+static unsigned const G_SYNTH_MAX_SONG_FILE_LINES = 512;
 
 #endif /* SYNTH_H */

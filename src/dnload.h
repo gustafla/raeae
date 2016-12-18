@@ -159,11 +159,13 @@ static void asm_exit(void)
 #define dnload_strcmp strcmp
 #define dnload_eglGetDisplay eglGetDisplay
 #define dnload_bcm_host_deinit bcm_host_deinit
+#define dnload_strtok strtok
 #define dnload_eglTerminate eglTerminate
 #define dnload_SDL_ShowCursor SDL_ShowCursor
 #define dnload_vc_dispmanx_update_start vc_dispmanx_update_start
 #define dnload_SDL_GetTicks SDL_GetTicks
 #define dnload_eglCreateContext eglCreateContext
+#define dnload_atoi atoi
 #define dnload_eglChooseConfig eglChooseConfig
 #define dnload_eglMakeCurrent eglMakeCurrent
 /** \endcond */
@@ -193,11 +195,13 @@ static void asm_exit(void)
 #define dnload_strcmp g_symbol_table.strcmp
 #define dnload_eglGetDisplay g_symbol_table.eglGetDisplay
 #define dnload_bcm_host_deinit g_symbol_table.bcm_host_deinit
+#define dnload_strtok g_symbol_table.strtok
 #define dnload_eglTerminate g_symbol_table.eglTerminate
 #define dnload_SDL_ShowCursor g_symbol_table.SDL_ShowCursor
 #define dnload_vc_dispmanx_update_start g_symbol_table.vc_dispmanx_update_start
 #define dnload_SDL_GetTicks g_symbol_table.SDL_GetTicks
 #define dnload_eglCreateContext g_symbol_table.eglCreateContext
+#define dnload_atoi g_symbol_table.atoi
 #define dnload_eglChooseConfig g_symbol_table.eglChooseConfig
 #define dnload_eglMakeCurrent g_symbol_table.eglMakeCurrent
 /** \endcond */
@@ -231,11 +235,13 @@ static struct SymbolTableStruct
   int (*strcmp)(const char*, const char*);
   EGLDisplay (*eglGetDisplay)(NativeDisplayType);
   void (*bcm_host_deinit)(void);
+  char* (*strtok)(char*, const char*);
   EGLBoolean (*eglTerminate)(EGLDisplay);
   int (*SDL_ShowCursor)(int);
   DISPMANX_UPDATE_HANDLE_T (*vc_dispmanx_update_start)(int32_t);
   uint32_t (*SDL_GetTicks)(void);
   EGLContext (*eglCreateContext)(EGLDisplay, EGLConfig, EGLContext, EGLint const*);
+  int (*atoi)(const char*);
   EGLBoolean (*eglChooseConfig)(EGLDisplay, EGLint const*, EGLConfig*, EGLint, EGLint*);
   EGLBoolean (*eglMakeCurrent)(EGLDisplay, EGLSurface, EGLSurface, EGLContext);
 } g_symbol_table =
@@ -264,11 +270,13 @@ static struct SymbolTableStruct
   (int (*)(const char*, const char*))0xa640caf5,
   (EGLDisplay (*)(NativeDisplayType))0xabd36ff6,
   (void (*)(void))0xadd96fb5,
+  (char* (*)(char*, const char*))0xaea1d2ff,
   (EGLBoolean (*)(EGLDisplay))0xb87f4317,
   (int (*)(int))0xb88bf697,
   (DISPMANX_UPDATE_HANDLE_T (*)(int32_t))0xb8dfc099,
   (uint32_t (*)(void))0xd1d0b104,
   (EGLContext (*)(EGLDisplay, EGLConfig, EGLContext, EGLint const*))0xd95202a9,
+  (int (*)(const char*))0xdaa33a8d,
   (EGLBoolean (*)(EGLDisplay, EGLint const*, EGLConfig*, EGLint, EGLint*))0xf4628a23,
   (EGLBoolean (*)(EGLDisplay, EGLSurface, EGLSurface, EGLContext))0xf780cac1,
 };
@@ -521,7 +529,7 @@ static void* dnload_find_symbol(uint32_t hash)
 static void dnload(void)
 {
   unsigned ii;
-  for(ii = 0; (31 > ii); ++ii)
+  for(ii = 0; (33 > ii); ++ii)
   {
     void **iter = ((void**)&g_symbol_table) + ii;
     *iter = dnload_find_symbol(*(uint32_t*)iter);

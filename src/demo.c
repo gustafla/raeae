@@ -8,6 +8,10 @@
 
 void demoMainLoop(unsigned start) {
     unsigned realTime=0;
+
+    /* Synth should've been initialized already, use song bpm to scale demo speed */
+    float const TIMESCALE = (float)gSynthSongData.bpm / 60.f;
+
 #ifdef USE_LD
     /* FPS counter vars */
     unsigned fpsTimePrint = 0;
@@ -22,15 +26,16 @@ void demoMainLoop(unsigned start) {
     /* Ready to rock and roll, start the music now */
     synthStartStream();
 
-    while (gDemoRunning) {
+    while (1) {
         /* realTime is local and contains time in msec */
         realTime = dnload_SDL_GetTicks()-start;
         /* gCurTime is global and contains time in musical beats */
-        gCurTime = ((float)realTime / 1000.f) * G_DEMO_TIMESCALE;
+        gCurTime = ((float)realTime / 1000.f) * TIMESCALE;
 
         dnload_SDL_PollEvent(&event);
-        if (event.type == SDL_KEYDOWN | event.type == SDL_QUIT | gCurTime>G_DEMO_LENGTH)
-            gDemoRunning = 0;
+        if (event.type == SDL_KEYDOWN | event.type == SDL_QUIT | realTime>G_DEMO_LENGTH) {
+            break;
+        }
 
         dnload_glClear(GL_COLOR_BUFFER_BIT);
         videoSwapBuffers();
