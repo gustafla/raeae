@@ -203,7 +203,7 @@ void synthLoadSong(char *song) {
                     }
                 }
 #ifdef USE_LD
-                printf("Found pattern %i: length %i\n", nk, j-1);
+                printf("Found pattern %i: length %i\n", nk, j);
 #endif
             }
             /* Track (:nk) */
@@ -226,7 +226,7 @@ void synthLoadSong(char *song) {
                     }
                 }
 #ifdef USE_LD
-                printf("Found track %i: length %i\n", nk, j-1);
+                printf("Found track %i: length %i\n", nk, j);
 #endif
             }
         }
