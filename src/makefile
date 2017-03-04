@@ -24,7 +24,7 @@ debugnovc:
 	g++ $(CFLAGS) $(ENTRY) $(LFLAGS) -o $(TARGET).debugnovc
 
 novc:
-	$(PYTHON) -m $(DNLOAD) -a sdl2 -c $(ENTRY) -v -o $(TARGET).novc
+	$(PYTHON) $(DNLOAD) -a sdl2 -c $(ENTRY) -v -o $(TARGET).novc
 
 clean:
 	rm -f *.S *.o *.unprocessed *.stripped *.bin *.ld $(TARGET)*

@@ -92,6 +92,8 @@ void demoMainLoop(unsigned start) {
     SDL_Event event;
 
     dnload_glClearColor(1,0,0,1);
+    dnload_glViewport(0, 0, G_VIDEO_X, G_VIDEO_Y);
+    dnload_glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     /****************************************************************************/
 
@@ -105,6 +107,7 @@ void demoMainLoop(unsigned start) {
 
     static const char* fragShader = "varying vec2 v_texcoord;\n"
                        "uniform float u_time;\n"
+                       "uniform float u_beat;\n"
                        "void main() {\n"
                        "  gl_FragColor = vec4(0., 1., 0., 1.);\n"
                        "}\n";
