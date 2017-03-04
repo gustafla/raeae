@@ -92,6 +92,7 @@ int synthSeq(float t) {
 }
 
 float synthMix(float t) {
+    float beatTime = (60.f/gSynthSongData.bpm);
     int seqPos = synthSeq(t);
     int trackNum, pattIndex, pattPos, note;
     /* Keeps track of where each track is currently */
@@ -114,8 +115,10 @@ float synthMix(float t) {
         if (note == END) { /* The note might just be that the pattern is at end and has no more notes to play */
             trackPos[trackNum]++; /* Move on to next pattern in the track! */
         } else { /* Actually, fuck this, let's unencode the tracks in synthInit to notes and then just linearly play from it, checking if it loops or not */
-            sample += gSynthSongData.instruments[trackNum].waveform(t, gSynthFreqs[note]) * 
-                      gSynthSongData.instruments[trackNum].volume;
+            sample += gSynthSongData.instruments[trackNum].waveform(t, gSynthFreqs[note])
+                      * gSynthSongData.instruments[trackNum].volume
+                      /* CHANGEME: Hack to get a linear release */
+                      * (1.f-((t+beatTime/2.) - (beatTime * float(seqPos))));
         }
     }
 
@@ -266,7 +269,7 @@ void synthInit() {
         }
     }
     /* Print a new line that isn't the progress indicator */
-    dnload_printf("\n");
+    dnload_printf("\rMusic precalc: 100%\n");
 
 #ifdef USE_LD
     puts("Synth render done.");

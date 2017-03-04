@@ -21,6 +21,7 @@ static SDL_Window *gVideoSDLWindow;
 void videoInit(int w, int h) {
 #ifdef DNLOAD_VIDEOCORE
     videocore_create_native_window(w, h);
+    /* */
     egl_init((NativeWindowType)&g_egl_native_window, &g_egl_display, &g_egl_surface);
     /* Needed for keyb */
     dnload_SDL_SetVideoMode(0, 0, 0, SDL_HWSURFACE);
@@ -28,8 +29,17 @@ void videoInit(int w, int h) {
     dnload_SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     dnload_SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     dnload_SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    /* Requesting gamma correct framebuffer */
+    dnload_SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
     gVideoSDLWindow = dnload_SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_OPENGL);
     dnload_SDL_GL_CreateContext(gVideoSDLWindow);
+#ifdef USE_LD
+    /* Let's see if the gamma correctness sticked */
+    int a;
+    SDL_GL_GetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, &a);
+    printf("SDL_GL_FRAMEBUFFER_SRGB_CAPABLE: %d\n", a);
+#endif
+    dnload_glewInit();
 #endif
     dnload_SDL_ShowCursor(0);
 }

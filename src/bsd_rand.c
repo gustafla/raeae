@@ -1,5 +1,4 @@
 #include "bsd_rand.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <features.h>

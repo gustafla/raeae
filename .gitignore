@@ -8,3 +8,5 @@ a.out*
 *.swp
 *.extra.cpp
 dnload.h
+*.py
+src/dnload/
