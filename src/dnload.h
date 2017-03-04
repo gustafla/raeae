@@ -139,12 +139,14 @@ static void asm_exit(void)
 #define dnload_fmodf fmodf
 #define dnload_SDL_GL_SetAttribute SDL_GL_SetAttribute
 #define dnload_glClear glClear
+#define dnload_glGetUniformLocation glGetUniformLocation
 #define dnload_SDL_GL_SwapWindow SDL_GL_SwapWindow
 #define dnload_glBindAttribLocation glBindAttribLocation
 #define dnload_glAttachShader glAttachShader
 #define dnload_memcpy memcpy
 #define dnload_printf printf
 #define dnload_SDL_CreateWindow SDL_CreateWindow
+#define dnload_glUniform1f glUniform1f
 #define dnload_SDL_PollEvent SDL_PollEvent
 #define dnload_glCreateShader glCreateShader
 #define dnload_SDL_OpenAudioDevice SDL_OpenAudioDevice
@@ -176,12 +178,14 @@ static void asm_exit(void)
 #define dnload_fmodf g_symbol_table.fmodf
 #define dnload_SDL_GL_SetAttribute g_symbol_table.SDL_GL_SetAttribute
 #define dnload_glClear g_symbol_table.glClear
+#define dnload_glGetUniformLocation g_symbol_table.glGetUniformLocation
 #define dnload_SDL_GL_SwapWindow g_symbol_table.SDL_GL_SwapWindow
 #define dnload_glBindAttribLocation g_symbol_table.glBindAttribLocation
 #define dnload_glAttachShader g_symbol_table.glAttachShader
 #define dnload_memcpy g_symbol_table.memcpy
 #define dnload_printf g_symbol_table.printf
 #define dnload_SDL_CreateWindow g_symbol_table.SDL_CreateWindow
+#define dnload_glUniform1f g_symbol_table.glUniform1f
 #define dnload_SDL_PollEvent g_symbol_table.SDL_PollEvent
 #define dnload_glCreateShader g_symbol_table.glCreateShader
 #define dnload_SDL_OpenAudioDevice g_symbol_table.SDL_OpenAudioDevice
@@ -217,12 +221,14 @@ static struct SymbolTableStruct
   float (*fmodf)(float, float);
   int (*SDL_GL_SetAttribute)(SDL_GLattr, int);
   void (DNLOAD_APIENTRY *glClear)(GLbitfield);
+  GLint (DNLOAD_APIENTRY *glGetUniformLocation)(GLuint, const GLchar*);
   void (*SDL_GL_SwapWindow)(SDL_Window*);
   void (DNLOAD_APIENTRY *glBindAttribLocation)(GLuint, GLuint, const GLchar*);
   void (DNLOAD_APIENTRY *glAttachShader)(GLuint, GLuint);
   void* (*memcpy)(void*, const void*, size_t);
   int (*printf)(const char* __restrict, ...);
   SDL_Window* (*SDL_CreateWindow)(const char*, int, int, int, int, Uint32);
+  void (DNLOAD_APIENTRY *glUniform1f)(GLint, GLfloat);
   int (*SDL_PollEvent)(SDL_Event*);
   GLuint (DNLOAD_APIENTRY *glCreateShader)(GLenum);
   SDL_AudioDeviceID (*SDL_OpenAudioDevice)(const char*, int, const SDL_AudioSpec*, SDL_AudioSpec*, int);
@@ -253,12 +259,14 @@ static struct SymbolTableStruct
   (float (*)(float, float))0x16a18daa,
   (int (*)(SDL_GLattr, int))0x1da21ab0,
   (void (DNLOAD_APIENTRY *)(GLbitfield))0x1fd92088,
+  (GLint (DNLOAD_APIENTRY *)(GLuint, const GLchar*))0x25c12218,
   (void (*)(SDL_Window*))0x295bfb59,
   (void (DNLOAD_APIENTRY *)(GLuint, GLuint, const GLchar*))0x2da45fa1,
   (void (DNLOAD_APIENTRY *)(GLuint, GLuint))0x30b3cfcf,
   (void* (*)(void*, const void*, size_t))0x3dbddf77,
   (int (*)(const char* __restrict, ...))0x3e973eb9,
   (SDL_Window* (*)(const char*, int, int, int, int, Uint32))0x4fbea370,
+  (void (DNLOAD_APIENTRY *)(GLint, GLfloat))0x4fe976c4,
   (int (*)(SDL_Event*))0x64949d97,
   (GLuint (DNLOAD_APIENTRY *)(GLenum))0x6b4ffac6,
   (SDL_AudioDeviceID (*)(const char*, int, const SDL_AudioSpec*, SDL_AudioSpec*, int))0x6ba6c19e,
@@ -533,7 +541,7 @@ static void* dnload_find_symbol(uint32_t hash)
 static void dnload(void)
 {
   unsigned ii;
-  for(ii = 0; (34 > ii); ++ii)
+  for(ii = 0; (36 > ii); ++ii)
   {
     void **iter = ((void**)&g_symbol_table) + ii;
     *iter = dnload_find_symbol(*(uint32_t*)iter);

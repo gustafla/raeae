@@ -1,19 +1,19 @@
 #ifndef VIDEO_C
 #define VIDEO_C
 
+#ifdef USE_LD
+#ifndef DNLOAD_GLESV2
+#define GLEW_STATIC
+#include "glew.c"
+#endif
+#endif
+
 #include "dnload.h"
 
 #ifdef DNLOAD_VIDEOCORE
 #include "dnload_egl.h"
 #include "dnload_videocore.h"
 #endif
-
-/*#ifdef USE_LD
-#ifndef DNLOAD_GLESV2
-#define GLEW_STATIC
-#include <GL/glew.h>
-#endif
-#endif*/
 
 #ifdef DNLOAD_GLESV2
 #include <GLES2/gl2.h>

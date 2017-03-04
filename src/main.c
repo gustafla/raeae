@@ -18,7 +18,7 @@ void _start()
 #endif
 {
     dnload();
-	dnload_puts("Kalteri Mafia rul3z while preparing the demo!!1");
+	dnload_puts("\n\n\nGREETS TO Ivory and Faemiyah! And everyone else who knows me.\nLike the Nvidia booth staff.\nAnd shiona too!\n\n\n");
     dnload_SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO);
 
     /* Precalc music, set up sound playblack */

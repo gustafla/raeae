@@ -47,6 +47,16 @@ GLint loadShader(const char* src, GLenum type) {
     glGetShaderiv(handle, GL_COMPILE_STATUS, &compiled);
 
     if (compiled == GL_FALSE) {
+        GLint infoLen = 0;
+        glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &infoLen);
+        
+        if (infoLen > 1) {
+            char* infoLog = (char*)malloc(sizeof(char) * infoLen);
+            glGetShaderInfoLog(handle, infoLen, NULL, infoLog);
+            printf("%s", infoLog);
+            free(infoLog);
+        }
+
         glDeleteShader(handle);
         return -1;
     }
@@ -106,13 +116,110 @@ void demoMainLoop(unsigned start) {
                        "}\n";
 
     static const char* fragShader = "varying vec2 v_texcoord;\n"
-                       "uniform float u_time;\n"
-                       "uniform float u_beat;\n"
-                       "void main() {\n"
-                       "  gl_FragColor = vec4(0., 1., 0., 1.);\n"
-                       "}\n";
+"uniform float u_time;\n"
+"#define PI  3.14159\n"
+"#define EPS 0.00001\n"
+"#define E   2.71828\n"
+"#define beat mod(u_time, 1.)\n"
+"float rand(vec2 n) {\n"
+"    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);\n"
+"}\n"
+"vec2 rotate(vec2 v, float a) {\n"
+"	float s = sin(a);\n"
+"	float c = cos(a);\n"
+"	mat2 m = mat2(c, -s, s, c);\n"
+"	return m * v;\n"
+"}\n"
+"float stripes(vec2 uv, float f) {\n"
+"    return clamp(sin(uv.x*2.*PI*f)*(1./EPS), 0., 1.);\n"
+"}\n"
+"float freqtransform(float l, float base, float s) {\n"
+"    return base + floor(l*s) * base;\n"
+"}\n"
+"float saturate(float v) {\n"
+"    return clamp(v, 0., 1.);\n"
+"}\n"
+"float circle(vec2 uv, vec2 pos, float r) {\n"
+"    return saturate((r-length(uv - pos))*(1./EPS));\n"
+"}\n"
+"float scene5(vec2 uv, float start) {\n"
+"    float t = u_time-start;\n"
+"    return 1.-t/4.;\n"
+"}\n"
+"float scene4(vec2 uv, float start) {\n"
+"    float t = u_time-start;\n"
+"    t*=0.2;\n"
+"    return sin(\n"
+"        sin(uv.x*8.+t*0.2)\n"
+"        	+sin(uv.y*8.+t*1.3)\n"
+"        	+sin(sin(uv.x*12.+uv.y*12.))\n"
+"    )*0.5+0.5+beat*sin(t);\n"
+"}\n"
+"float scene3(vec2 uv, float start) {\n"
+"    float t = u_time-start;\n"
+"    	float r1 = 2.+beat+t*2.4;\n"
+"    	float r2 = 3.+beat+t*1.8;\n"
+"    	float r3 = 4.+beat+t*1.1;\n"
+"    	vec2 pos = vec2(0., -t*0.2+beat*0.06+0.6);\n"
+"       return circle(uv, pos, 0.5)*0.2\n"
+"	     + circle(uv, vec2(sin(r1)*0.3+pos.x, cos(r1)*0.3+pos.y), 0.07)*0.2\n"
+"        + circle(uv, vec2(sin(r2)*0.5+pos.x, cos(r2)*0.5+pos.y), 0.07)*0.2\n"
+"        + circle(uv, vec2(sin(r3)*0.6+pos.x, cos(r3)*0.6+pos.y), 0.1)*0.2;\n"
+"}\n"
+"float scene2(vec2 uv, float start) {\n"
+"    float t = u_time-start;\n"
+"    return circle(uv, vec2(0., t*0.2-beat*0.1-0.3), 0.5)*0.2\n"
+"        + circle(uv, vec2(beat*t*0.1+t*0.1, -beat*0.5), 0.07)*0.2\n"
+"        + circle(uv, vec2(-beat*t*0.2-t*0.08, -beat*0.1), 0.07)*0.2\n"
+"        + circle(uv, vec2(-0.7+beat+t*0.1-t*0.12, 0.3-beat*0.2-t*0.07), 0.1)*0.2;\n"
+"}\n"
+"float scene1(vec2 uv, float start) {\n"
+"    float t = u_time-start;\n"
+"    t*=0.3;\n"
+"    return sin(rotate(uv, t*0.4-beat*0.2).x*2. + beat*0.4 - t*2.)*0.5+0.4;\n"
+"}\n"
+"float scene(vec2 uv) {                         \n"
+"    if (u_time < 12.) {                        \n"
+"    	return scene1(uv, 0.);                  \n"
+"    } else if (u_time < 12.+6.) {              \n"
+"    	return scene2(uv, 12.);                 \n"
+"    } else if (u_time < 12.+6.+6.) {           \n"
+"        return scene3(uv, 12.+6.);             \n"
+"    } else if (u_time < 12.+6.+6.+5.) {         \n"
+"        return scene4(uv, 12.+6.+6.);          \n"
+"    } else {                                   \n"
+"        return scene5(uv, 12.+6.+6.+5.);       \n"
+"    }                                          \n"
+"}                                              \n"
+"void main() {\n"
+"	 vec2 uv = (v_texcoord)*2. - vec2(1.);\n"
+"    uv.y /= 16./9.;\n"
+"    float imageLevels = freqtransform(\n"
+"       saturate(scene(uv)),\n"
+"       2.,\n"
+"       6.\n"
+"    );\n"
+"    float sep = (1.-beat)*0.004+0.007;\n"
+"    sep+=saturate(u_time*0.05-(12.+6.+6.+5.+5.-beat*0.2)*0.05);\n"
+"    vec3 c = stripes(\n"
+"        rotate(uv, imageLevels/10.),\n"
+"        imageLevels\n"
+"    )*vec3(0.0, 1.0, 0.0)\n"
+"    + stripes(\n"
+"        rotate(vec2(uv.x+sep, uv.y), imageLevels/10.),\n"
+"        imageLevels\n"
+"    )*vec3(1.0, 0.0, 0.0)\n"
+"    +stripes(\n"
+"        rotate(vec2(uv.x-sep, uv.y), imageLevels/10.),\n"
+"        imageLevels\n"
+"    )*vec3(0.0, 0.0, 1.0);\n"
+"    c-=length(uv)*0.3+beat*0.06;\n"
+"	gl_FragColor = vec4(clamp(c,0.,1.)+rand(uv+u_time)*0.06,1.0);\n"
+"}\n";
     
     const GLint shader = linkProgram(loadShader(vertShader, GL_VERTEX_SHADER), loadShader(fragShader, GL_FRAGMENT_SHADER));
+    const GLint shaderUniformTime = dnload_glGetUniformLocation(shader, "u_time");
+    /*const GLint shaderUniformBeat = dnload_glGetUniformLocation(shader, "u_beat");*/
 
     /***************************************************************************/
 
@@ -133,6 +240,8 @@ void demoMainLoop(unsigned start) {
 
         dnload_glClear(GL_COLOR_BUFFER_BIT);
 
+        dnload_glUseProgram(shader);
+        dnload_glUniform1f(shaderUniformTime, gCurTime);
         drawQuad(shader);
 
         videoSwapBuffers();

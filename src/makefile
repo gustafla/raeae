@@ -7,7 +7,7 @@ debug:CFLAGS=-g -fwhole-program -I/usr/include/SDL -I/opt/vc/include -DUSE_LD -D
 debug:LFLAGS=-L/opt/vc/lib -lc -lSDL -lGLESv2 -lEGL -lbcm_host
 
 debugnovc:CFLAGS=-g -fwhole-program -I/usr/include/SDL2 -DUSE_LD
-debugnovc:LFLAGS=-lc -lSDL2 -lGLESv2 -lGLEW
+debugnovc:LFLAGS=-lc -lSDL2 -lGL
 
 all:
 	make debug && make size
