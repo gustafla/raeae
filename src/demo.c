@@ -5,6 +5,7 @@
 #include "globals.h"
 #include "video.c"
 #include <stdio.h>
+#include <unistd.h>
 
 void drawQuad(GLint program) {
     float quad[2*3*3] = {
@@ -86,7 +87,7 @@ GLint linkProgram(GLint a, GLint b) {
     return handle;
 }
 
-void demoMainLoop(unsigned start) {
+void demoMainLoop() {
     unsigned realTime=0;
 
     /* Synth should've been initialized already, use song bpm to scale demo speed */
@@ -101,7 +102,7 @@ void demoMainLoop(unsigned start) {
 
     SDL_Event event;
 
-    dnload_glClearColor(1,0,0,1);
+    dnload_glClearColor(0,0,0,1);
     dnload_glViewport(0, 0, G_VIDEO_X, G_VIDEO_Y);
     dnload_glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -223,9 +224,17 @@ void demoMainLoop(unsigned start) {
 
     /***************************************************************************/
 
+#ifdef USE_LD
+    while(dnload_SDL_GetTicks() < 2000) {
+        glClear(GL_COLOR_BUFFER_BIT);
+        videoSwapBuffers();
+    }
+#endif
+
     /* Ready to rock and roll, start the music now */
     synthStartStream();
 
+    unsigned start = dnload_SDL_GetTicks();
     while (1) {
         /* realTime is local and contains time in msec */
         realTime = dnload_SDL_GetTicks()-start;

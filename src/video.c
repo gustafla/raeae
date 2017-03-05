@@ -46,7 +46,7 @@ void videoInit(int w, int h, int fullscreen) {
 #endif
     /* Requesting gamma correct framebuffer */
     dnload_SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
-    gVideoSDLWindow = dnload_SDL_CreateWindow(NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_OPENGL | (fullscreen == 1 ? SDL_WINDOW_FULLSCREEN : 0));
+    gVideoSDLWindow = dnload_SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_OPENGL | (fullscreen == 1 ? SDL_WINDOW_FULLSCREEN : 0));
     dnload_SDL_GL_CreateContext(gVideoSDLWindow);
 #ifdef USE_LD
     /* Let's see if the gamma correctness sticked */
