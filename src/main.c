@@ -27,7 +27,7 @@ void _start()
     videoInit(G_VIDEO_X, G_VIDEO_Y, 0);
 
     /* Passing start time for accurate timing */
-    demoMainLoop(dnload_SDL_GetTicks());
+    demoMainLoop();
 
     videoDeinit();
 

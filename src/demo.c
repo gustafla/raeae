@@ -86,7 +86,7 @@ GLint linkProgram(GLint a, GLint b) {
     return handle;
 }
 
-void demoMainLoop(unsigned start) {
+void demoMainLoop() {
     unsigned realTime=0;
 
     /* Synth should've been initialized already, use song bpm to scale demo speed */
@@ -226,6 +226,7 @@ void demoMainLoop(unsigned start) {
     /* Ready to rock and roll, start the music now */
     synthStartStream();
 
+    unsigned start = dnload_SDL_GetTicks();
     while (1) {
         /* realTime is local and contains time in msec */
         realTime = dnload_SDL_GetTicks()-start;
